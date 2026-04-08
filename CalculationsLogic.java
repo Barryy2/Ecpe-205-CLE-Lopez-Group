@@ -57,7 +57,26 @@ public class CalculationsLogic {
             }
 
             // Strip away letters/symbols, keep only numbers and decimals
-            String cleanText = text.replaceAll("[^\\d.]", "").trim();
+            String cleanText = text.replaceAll("[^\\d.]", "#").trim();
+
+            // Checks if it did contain letters/symbols
+            if (cleanText.contains("#")){
+                JOptionPane.showMessageDialog(null, "Contains non-numeric values, please try again.");
+                return totalBal;
+            }
+
+            int dec = 0;
+            for (char c : cleanText.toCharArray()){
+                if (c == '.'){
+                    dec++;
+                }
+
+                if (dec > 1){
+                    JOptionPane.showMessageDialog(null, "Amount entered contains too many decimals, please try again.");
+                    return totalBal;
+                }
+            }
+
             if (!cleanText.isEmpty()) {
                 try {
                     total += Double.parseDouble(cleanText);
