@@ -1,7 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="732395d6-000f-4ae7-9d39-aa392a384c22" name="Changes" comment="" />
+    <list default="true" id="abc21e54-ef29-4a23-8b4a-b0e982cc7864" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/DatabaseManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TrackerUI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bank_tracker.db" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/Ecpe-205-CLE-Lopez-Group.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/CalculationsLogic.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/DatabaseManager.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/Main.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$1.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$2.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/bank_tracker.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Ecpe-205-CLE-Lopez-Group.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Ecpe-205-CLE-Lopez-Group.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CalculationsLogic.java" beforeDir="false" afterPath="$PROJECT_DIR$/CalculationsLogic.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Main.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,22 +36,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Barryy2"
-  }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Barryy2/Ecpe-205-CLE-Lopez-Group.git",
-    "accountId": "2875647f-b4ef-472e-a6dd-38d82a485729"
-  }
-}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
+  "associatedIndex": 5
 }]]></component>
-  <component name="ProjectId" id="3C3oTn6N3YOCtKzg4OcRXeQQsax" />
+  <component name="ProjectId" id="3C3rjXmQbc6Ex1NJ4GO81QZ09AW" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -34,17 +48,18 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "Lopez",
-    "kotlin-language-version-configured": "true"
+    "git-widget-placeholder": "Merging Gonzales",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/2302278/IdeaProjects/Ecpe-205-CLE-Lopez-Group"
   }
 }]]></component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="732395d6-000f-4ae7-9d39-aa392a384c22" name="Changes" comment="" />
-      <created>1775623624643</created>
+      <changelist id="abc21e54-ef29-4a23-8b4a-b0e982cc7864" name="Changes" comment="" />
+      <created>1775625229879</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1775623624643</updated>
+      <updated>1775625229879</updated>
     </task>
     <servers />
   </component>

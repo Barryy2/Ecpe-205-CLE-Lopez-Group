@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.util.List;
 
 public class CalculationsLogic {
@@ -7,8 +8,8 @@ public class CalculationsLogic {
      * Validation of calculations
      */
 
-    private double subBal;
-    private double totalBal;
+    private double subBal;      // Used for sub accounts
+    private double totalBal;    // Used for total net
 
     // Constructor
     public CalculationsLogic(double subBal, double totalBal) {
@@ -47,6 +48,14 @@ public class CalculationsLogic {
     public double computeTotalAssets(List<String> amounts) {
         double total = 0.0;
         for (String text : amounts) {
+            // Cleans the spaces to check if the first char of the string is a dash (negative)
+            String cleanSpace = text.replaceAll(" ", "").trim();
+            char neg = cleanSpace.charAt(0);
+            if (neg == '-'){
+                JOptionPane.showMessageDialog(null, "Negative amount entered, please place another amount.");
+                return totalBal;
+            }
+
             // Strip away letters/symbols, keep only numbers and decimals
             String cleanText = text.replaceAll("[^\\d.]", "").trim();
             if (!cleanText.isEmpty()) {
