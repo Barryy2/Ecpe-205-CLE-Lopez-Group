@@ -1,8 +1,6 @@
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -15,24 +13,17 @@ public class TrackerUI extends JFrame {
     private JLabel totalLabel;
     private BankRow selectedRow = null;
 
-    // Database and Logic instances
     private final DatabaseManager dbManager;
     private final CalculationsLogic calcLogic;
 
-    // Standardized Sizes - We only lock the right-side columns now.
-    // The first column will be allowed to stretch dynamically!
     private final int ROW_HEIGHT = 50;
-    private final int COL2_WIDTH = 150; // Amount
-    private final int COL3_WIDTH = 150; // Actions
+    private final int COL2_WIDTH = 150;
+    private final int COL3_WIDTH = 230;
 
-    // Color Palette
     private final Color COLOR_BG = Color.WHITE;
-    private final Color COLOR_HOVER = new Color(245, 248, 250);
     private final Color COLOR_SELECTED = new Color(230, 238, 245);
     private final Color COLOR_TEXT_MAIN = new Color(33, 37, 41);
-    private final Color COLOR_TEXT_MUTED = new Color(108, 117, 125);
     private final Color COLOR_GRIDLINE = new Color(210, 210, 210);
-    private final Font FONT_MAIN = new Font("SansSerif", Font.PLAIN, 15);
     private final Font FONT_BOLD = new Font("SansSerif", Font.BOLD, 15);
 
     public TrackerUI() {
@@ -48,339 +39,407 @@ public class TrackerUI extends JFrame {
         setLayout(new BorderLayout());
         getContentPane().setBackground(COLOR_BG);
 
-        // --- DASHBOARD PANEL ---
-        JPanel dashboardPanel = new JPanel(new BorderLayout());
-        dashboardPanel.setBackground(Color.GREEN);
-        dashboardPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        //CENTER: Scrollable Table Data
         listContainer = new JPanel();
         listContainer.setLayout(new BoxLayout(listContainer, BoxLayout.Y_AXIS));
-        listContainer.setBackground(Color.BLUE);
+        listContainer.setBackground(COLOR_BG);
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.setBackground(COLOR_BG);
+        tablePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         JScrollPane scrollPane = new JScrollPane(listContainer);
         scrollPane.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        //scrollPane.getViewport().setBackground(Color.RED);
+        scrollPane.getViewport().setBackground(COLOR_BG);
 
-        // --- BUILD THE TABLE HEADER ---
         JPanel headerRow = new JPanel();
         headerRow.setLayout(new BoxLayout(headerRow, BoxLayout.X_AXIS));
-        headerRow.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // Headers
         headerRow.add(createHeaderCell("Bank Details", 0, true));
         headerRow.add(createHeaderCell("Amount", COL2_WIDTH, false));
         headerRow.add(createHeaderCell("Actions", COL3_WIDTH, false));
-
         scrollPane.setColumnHeaderView(headerRow);
 
-        // --- SOUTH: Controls and Totals ---
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         bottomPanel.setBackground(COLOR_BG);
         bottomPanel.setBorder(new EmptyBorder(15, 0, 0, 0));
 
-        JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        controlsPanel.setBackground(COLOR_BG);
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        controls.setBackground(COLOR_BG);
+        JButton addBtn = createFlatButton("+ Add Bank", new Color(240, 240, 240), COLOR_TEXT_MAIN);
+        addBtn.addActionListener(e -> addBankRow("New Bank", "0.00", "", true));
 
-        JButton plusButton = createFlatButton("+ Add Bank", new Color(240, 240, 240), COLOR_TEXT_MAIN);
-        plusButton.addActionListener(e -> {
-            addBankRow("New Bank", "", true);
-            revalidate();
-            repaint();
+        JButton removeBtn = createFlatButton("- Remove Selected", new Color(255, 240, 240), new Color(200, 50, 50));
+        removeBtn.addActionListener(e -> {
+            if (selectedRow != null) removeBankRow(selectedRow);
         });
 
-        JButton minusButton = createFlatButton("- Remove Selected", new Color(255, 240, 240), new Color(200, 50, 50));
-        minusButton.addActionListener(e -> {
-            if (selectedRow != null) {
-                removeBankRow(selectedRow);
-            } else if (!bankRows.isEmpty()) {
-                removeBankRow(bankRows.get(bankRows.size() - 1));
-            }
-        });
-
-        controlsPanel.add(plusButton);
-        controlsPanel.add(minusButton);
+        controls.add(addBtn);
+        controls.add(removeBtn);
 
         JPanel totalsPanel = new JPanel(new BorderLayout());
         totalsPanel.setBackground(COLOR_BG);
         totalsPanel.setBorder(new EmptyBorder(15, 5, 0, 5));
-
         totalLabel = new JLabel("Total Net: 0.00");
         totalLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
-        totalLabel.setForeground(COLOR_TEXT_MAIN);
 
-        JButton saveButton = createFlatButton("Save Data", new Color(40, 167, 69), Color.WHITE);
-        saveButton.addActionListener(e -> saveUIStateToDatabase());
+        JButton saveBtn = createFlatButton("Save All Data", new Color(40, 167, 69), Color.WHITE);
+        saveBtn.addActionListener(e -> saveUIStateToDatabase());
 
         totalsPanel.add(totalLabel, BorderLayout.WEST);
-        totalsPanel.add(saveButton, BorderLayout.EAST);
+        totalsPanel.add(saveBtn, BorderLayout.EAST);
 
-        bottomPanel.add(controlsPanel);
+        bottomPanel.add(controls);
         bottomPanel.add(totalsPanel);
+        tablePanel.add(bottomPanel, BorderLayout.SOUTH);
 
-        dashboardPanel.add(scrollPane, BorderLayout.CENTER);
-        dashboardPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        tabbedPane.setFocusable(false);
-        tabbedPane.addTab("Dashboard", dashboardPanel);
-
+        tabbedPane.addTab("Dashboard", tablePanel);
         add(tabbedPane, BorderLayout.CENTER);
 
         loadDataIntoUI();
 
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e) {
-                saveUIStateToDatabase();
-            }
+            public void windowClosing(WindowEvent e) { saveUIStateToDatabase(); }
         });
 
-        setSize(800, 650); // Slightly wider default to show off the responsive layout
+        setSize(850, 650);
         setLocationRelativeTo(null);
     }
 
+    private void showImagePopup(BankRow row) {
+        JDialog dialog = new JDialog(this, "Update Icon", true);
+        dialog.setLayout(new FlowLayout());
+        dialog.getContentPane().setBackground(COLOR_BG);
+
+        JLabel preview = new JLabel("", SwingConstants.CENTER);
+        preview.setPreferredSize(new Dimension(100, 100));
+        preview.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
+        ImageIcon icon = scaleIcon(row.imagePath, 100, 100);
+        if (icon != null) preview.setIcon(icon);
+        else preview.setText("No Image");
+
+        JButton upload = createFlatButton("Select Image File", new Color(0, 123, 255), Color.WHITE);
+        upload.addActionListener(e -> {
+            JFileChooser fc = new JFileChooser();
+            if (fc.showOpenDialog(dialog) == JFileChooser.APPROVE_OPTION) {
+                row.updateRowImage(fc.getSelectedFile().getAbsolutePath());
+                dialog.dispose();
+            }
+        });
+
+        dialog.add(preview);
+        dialog.add(upload);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private ImageIcon scaleIcon(String path, int w, int h) {
+        if (path == null || path.isEmpty()) return null;
+        try {
+            return new ImageIcon(new ImageIcon(path).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH));
+        } catch (Exception e) { return null; }
+    }
+
     private JPanel createHeaderCell(String title, int width, boolean stretch) {
-        JPanel panel = new JPanel(new BorderLayout());
-
-        if (stretch) {
-            panel.setPreferredSize(new Dimension(300, ROW_HEIGHT));
-            // MAX_VALUE allows this specific column to expand infinitely to fill empty space
-            panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, ROW_HEIGHT));
-        } else {
-            Dimension fixedSize = new Dimension(width, ROW_HEIGHT);
-            panel.setPreferredSize(fixedSize);
-            panel.setMinimumSize(fixedSize);
-            panel.setMaximumSize(fixedSize);
-        }
-
-        panel.setBackground(new Color(238, 242, 246));
-        panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.WHITE, new Color(180, 180, 180)));
-
-        JLabel label = new JLabel(title, SwingConstants.CENTER);
-        label.setFont(new Font("SansSerif", Font.BOLD, 13));
-        label.setForeground(new Color(50, 50, 50));
-        panel.add(label, BorderLayout.CENTER);
-
-        return panel;
+        JPanel p = new JPanel(new BorderLayout());
+        if (stretch) p.setMaximumSize(new Dimension(Integer.MAX_VALUE, ROW_HEIGHT));
+        else { Dimension d = new Dimension(width, ROW_HEIGHT); p.setPreferredSize(d); p.setMaximumSize(d); }
+        p.setBackground(new Color(238, 242, 246));
+        p.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.WHITE, new Color(180, 180, 180)));
+        JLabel l = new JLabel(title, SwingConstants.CENTER);
+        l.setFont(new Font("SansSerif", Font.BOLD, 13));
+        p.add(l, BorderLayout.CENTER);
+        return p;
     }
 
     private JButton createFlatButton(String text, Color bg, Color fg) {
-        JButton btn = new JButton(text);
-        btn.setFont(new Font("SansSerif", Font.BOLD, 13));
-        btn.setForeground(fg);
-        btn.setBackground(bg);
-        btn.setBorder(new EmptyBorder(8, 15, 8, 15));
-        btn.setFocusPainted(false);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setContentAreaFilled(false);
-        btn.setOpaque(true);
-        return btn;
+        JButton b = new JButton(text);
+        b.setFont(new Font("SansSerif", Font.BOLD, 11));
+        b.setBackground(bg); b.setForeground(fg);
+        b.setOpaque(true); b.setBorderPainted(false);
+        b.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        b.setMargin(new Insets(0, 0, 0, 0));
+        return b;
     }
 
-    private void selectRow(BankRow row) {
-        if (selectedRow != null) selectedRow.setBackground(COLOR_BG);
-        selectedRow = row;
-        if (selectedRow != null) selectedRow.setBackground(COLOR_SELECTED);
-    }
-
-    private void addBankRow(String name, String amount, boolean startInEditMode) {
-        BankRow row = new BankRow(name, amount, startInEditMode);
+    private void addBankRow(String name, String amount, String path, boolean edit) {
+        BankRow row = new BankRow(name, amount, path, true);
         bankRows.add(row);
         listContainer.add(row);
-        selectRow(row);
         calculateTotal();
+        listContainer.revalidate();
+        listContainer.repaint();
     }
 
     private void removeBankRow(BankRow row) {
         bankRows.remove(row);
-        listContainer.remove(row);
+
+        if (row.isMainRow) {
+            for (Component child : row.childrenPanel.getComponents()) {
+                if (child instanceof BankRow) {
+                    bankRows.remove((BankRow) child);
+                }
+            }
+            listContainer.remove(row);
+        } else {
+            Container parent = row.getParent();
+            if (parent != null) {
+                parent.remove(row);
+            }
+        }
+
         if (selectedRow == row) selectedRow = null;
         calculateTotal();
         listContainer.revalidate();
         listContainer.repaint();
     }
 
+    private void selectRow(BankRow row) {
+        if (selectedRow != null) selectedRow.setSelection(false);
+        selectedRow = row;
+        if (selectedRow != null) selectedRow.setSelection(true);
+    }
+
     private void calculateTotal() {
-        List<String> amountStrings = new ArrayList<>();
-        for (BankRow row : bankRows) {
-            amountStrings.add(row.amountField.getText());
-        }
-        double total = calcLogic.computeTotalAssets(amountStrings);
-        totalLabel.setText(String.format("Total Net: %,.2f", total));
+        List<String> amounts = new ArrayList<>();
+        for (BankRow r : bankRows) amounts.add(r.amountField.getText());
+        totalLabel.setText(String.format("Total Net: %,.2f", calcLogic.computeTotalAssets(amounts)));
     }
 
     private void loadDataIntoUI() {
-        List<String[]> accounts = dbManager.loadAccounts();
-
-        if (accounts.isEmpty()) {
-            addBankRow("Bank 1", "", true);
-            addBankRow("Bank 2", "", true);
+        List<String[]> data = dbManager.loadAccounts();
+        if (data.isEmpty()) {
+            addBankRow("Bank 1", "0.00", "", false);
         } else {
-            for (String[] acc : accounts) {
-                addBankRow(acc[0], acc[1], false);
+            BankRow currentMain = null;
+            for (String[] row : data) {
+                String parentId = row[1];
+                if (parentId.equals("0")) {
+                    currentMain = new BankRow(row[2], row[3], row[4], true);
+                    bankRows.add(currentMain);
+                    listContainer.add(currentMain);
+                } else if (currentMain != null) {
+                    currentMain.addSubBank(row[2], row[3], row[4]);
+                }
             }
         }
-        selectRow(null);
+        calculateTotal();
+        listContainer.revalidate();
+        listContainer.repaint();
     }
 
     private void saveUIStateToDatabase() {
-        this.requestFocusInWindow();
-        List<String[]> dataToSave = new ArrayList<>();
-        for (BankRow row : bankRows) {
-            String[] accountData = {
-                    row.nameField.getText().trim(),
-                    row.amountField.getText().trim()
-            };
-            dataToSave.add(accountData);
+        List<String[]> toSave = new ArrayList<>();
+        int idCounter = 1;
+
+        for (Component c : listContainer.getComponents()) {
+            if (c instanceof BankRow) {
+                BankRow mainRow = (BankRow) c;
+                int mainId = idCounter++;
+                toSave.add(new String[]{
+                        String.valueOf(mainId), "0", mainRow.nameField.getText(), mainRow.amountField.getText(), mainRow.imagePath
+                });
+
+                for (Component child : mainRow.childrenPanel.getComponents()) {
+                    if (child instanceof BankRow) {
+                        BankRow subRow = (BankRow) child;
+                        int subId = idCounter++;
+                        toSave.add(new String[]{
+                                String.valueOf(subId), String.valueOf(mainId), subRow.nameField.getText(), subRow.amountField.getText(), subRow.imagePath
+                        });
+                    }
+                }
+            }
         }
-        try {
-            dbManager.saveAccounts(dataToSave);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error saving data: " + e.getMessage());
-        }
+        try { dbManager.saveAccounts(toSave); } catch (Exception ignored) {}
     }
 
-    // --- CUSTOM ROW COMPONENT ---
-
     private class BankRow extends JPanel {
-        JTextField nameField;
-        JTextField amountField;
-        JButton editButton;
-        boolean isEditing;
+        JTextField nameField, amountField;
+        JLabel imgPlaceholder;
+        JButton editBtn;
+        JButton toggleBtn;
+        String imagePath;
+        boolean isEditing = false;
+        boolean isMainRow;
 
-        public BankRow(String name, String amount, boolean startInEditMode) {
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel headerPanel;
+        JPanel childrenPanel;
+        boolean isExpanded = false;
+
+        public BankRow(String name, String amount, String path, boolean isMainRow) {
+            this.imagePath = path;
+            this.isMainRow = isMainRow;
+
+            setLayout(new BorderLayout());
             setBackground(COLOR_BG);
 
-            // Limit maximum height of entire row so they don't stretch vertically
-            setMaximumSize(new Dimension(Integer.MAX_VALUE, ROW_HEIGHT));
+            headerPanel = new JPanel();
+            headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.X_AXIS));
+            headerPanel.setBackground(COLOR_BG);
 
-            // --- COLUMN 1: IMAGE + NAME (STRETCHES) ---
-            JPanel col1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
+            headerPanel.setPreferredSize(new Dimension(0, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10));
+            headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10));
+
+            int verticalGap = isMainRow ? 8 : 4;
+
+            JPanel col1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, verticalGap));
             col1.setOpaque(false);
-            col1.setPreferredSize(new Dimension(300, ROW_HEIGHT));
-            col1.setMaximumSize(new Dimension(Integer.MAX_VALUE, ROW_HEIGHT)); // Expand dynamically!
-            col1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
 
-            JLabel imgPlaceholder = new JLabel("img", SwingConstants.CENTER);
+            if (!isMainRow) {
+                col1.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE),
+                        BorderFactory.createEmptyBorder(0, 55, 0, 0)
+                ));
+            } else {
+                col1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
+                toggleBtn = createFlatButton("▶", COLOR_BG, COLOR_TEXT_MAIN);
+                toggleBtn.setPreferredSize(new Dimension(45, 30));
+                toggleBtn.addActionListener(e -> toggleExpand());
+                col1.add(toggleBtn);
+            }
+
+            imgPlaceholder = new JLabel("", SwingConstants.CENTER);
             imgPlaceholder.setPreferredSize(new Dimension(32, 32));
             imgPlaceholder.setOpaque(true);
-            imgPlaceholder.setBackground(new Color(240, 240, 240));
-            imgPlaceholder.setForeground(COLOR_TEXT_MUTED);
-            imgPlaceholder.setFont(new Font("SansSerif", Font.PLAIN, 10));
+            imgPlaceholder.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (isEditing) showImagePopup(BankRow.this);
+                }
+            });
+            updateRowImage(path);
 
             nameField = new JTextField(name);
-            nameField.setFont(FONT_MAIN);
-            nameField.setForeground(COLOR_TEXT_MAIN);
-            nameField.setOpaque(false);
-            nameField.setPreferredSize(new Dimension(220, 30));
+            nameField.setPreferredSize(new Dimension(160, 30));
+            nameField.setBorder(null); nameField.setOpaque(false);
+            nameField.setEditable(false);
 
-            col1.add(imgPlaceholder);
-            col1.add(nameField);
+            col1.add(imgPlaceholder); col1.add(nameField);
 
-            // --- COLUMN 2: AMOUNT (LOCKED WIDTH) ---
-            JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 8));
+            JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, verticalGap));
             col2.setOpaque(false);
-            Dimension col2Size = new Dimension(COL2_WIDTH, ROW_HEIGHT);
-            col2.setPreferredSize(col2Size);
-            col2.setMinimumSize(col2Size);
-            col2.setMaximumSize(col2Size);
+            Dimension d2 = new Dimension(COL2_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10);
+            col2.setPreferredSize(d2); col2.setMaximumSize(d2);
             col2.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
 
             amountField = new JTextField(amount);
-            amountField.setFont(FONT_BOLD);
-            amountField.setForeground(COLOR_TEXT_MAIN);
-            amountField.setOpaque(false);
-            amountField.setHorizontalAlignment(JTextField.RIGHT);
             amountField.setPreferredSize(new Dimension(110, 30));
-
-            amountField.getDocument().addDocumentListener(new DocumentListener() {
-                public void insertUpdate(DocumentEvent e) { calculateTotal(); }
-                public void removeUpdate(DocumentEvent e) { calculateTotal(); }
-                public void changedUpdate(DocumentEvent e) { calculateTotal(); }
-            });
-
+            amountField.setHorizontalAlignment(JTextField.RIGHT);
+            amountField.setBorder(null); amountField.setOpaque(false);
+            amountField.setEditable(false);
+            amountField.setFont(FONT_BOLD);
             col2.add(amountField);
 
-            // --- COLUMN 3: EDIT BUTTON (LOCKED WIDTH) ---
-            JPanel col3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 8));
+            JPanel col3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, verticalGap));
             col3.setOpaque(false);
-            Dimension col3Size = new Dimension(COL3_WIDTH, ROW_HEIGHT);
-            col3.setPreferredSize(col3Size);
-            col3.setMinimumSize(col3Size);
-            col3.setMaximumSize(col3Size);
+            Dimension d3 = new Dimension(COL3_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10);
+            col3.setPreferredSize(d3); col3.setMaximumSize(d3);
             col3.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_GRIDLINE));
 
-            editButton = new JButton();
-            editButton.setFont(new Font("SansSerif", Font.BOLD, 12));
-            editButton.setBorder(new EmptyBorder(5, 15, 5, 15));
-            editButton.setFocusPainted(false);
-            editButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            editButton.setContentAreaFilled(false);
-            editButton.setOpaque(true);
+            editBtn = createFlatButton("Edit", new Color(233, 236, 239), COLOR_TEXT_MAIN);
+            editBtn.setPreferredSize(new Dimension(70, 28));
+            editBtn.addActionListener(e -> toggleEditMode());
+            col3.add(editBtn);
 
-            editButton.addActionListener(e -> toggleEditMode(!isEditing));
+            if (isMainRow) {
+                JButton addSubBtn = createFlatButton("+ Sub", new Color(230, 245, 230), new Color(40, 167, 69));
+                addSubBtn.setPreferredSize(new Dimension(70, 28));
+                addSubBtn.addActionListener(e -> addSubBank("New Sub", "0.00", BankRow.this.imagePath));
+                col3.add(addSubBtn);
+            }
 
-            col3.add(editButton);
+            headerPanel.add(col1); headerPanel.add(col2); headerPanel.add(col3);
+            add(headerPanel, BorderLayout.NORTH);
 
-            add(col1);
-            add(col2);
-            add(col3);
+            if (isMainRow) {
+                childrenPanel = new JPanel();
+                childrenPanel.setLayout(new BoxLayout(childrenPanel, BoxLayout.Y_AXIS));
+                childrenPanel.setBackground(COLOR_BG);
+                childrenPanel.setVisible(false);
+                add(childrenPanel, BorderLayout.CENTER);
+            }
 
-            toggleEditMode(startInEditMode);
-
-            // Hover and Selection logic
-            MouseAdapter mouseAction = new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) { selectRow(BankRow.this); }
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    if (selectedRow != BankRow.this) setBackground(COLOR_HOVER);
+            headerPanel.addMouseListener(new MouseAdapter() {
+                public void mousePressed(MouseEvent e) {
+                    selectRow(BankRow.this);
+                    if (isMainRow && !isEditing) {
+                        toggleExpand();
+                    }
                 }
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    if (selectedRow != BankRow.this) setBackground(COLOR_BG);
-                }
-            };
-
-            this.addMouseListener(mouseAction);
-            col1.addMouseListener(mouseAction);
-            col2.addMouseListener(mouseAction);
-            col3.addMouseListener(mouseAction);
-
-            FocusAdapter focusAction = new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) { selectRow(BankRow.this); }
-            };
-            nameField.addFocusListener(focusAction);
-            amountField.addFocusListener(focusAction);
+            });
         }
 
-        private void toggleEditMode(boolean enable) {
-            isEditing = enable;
-            nameField.setEditable(enable);
-            amountField.setEditable(enable);
+        @Override
+        public Dimension getMaximumSize() {
+            return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+        }
 
-            if (enable) {
-                editButton.setText("Done");
-                editButton.setBackground(new Color(212, 237, 218));
-                editButton.setForeground(new Color(21, 87, 36));
+        public void setSelection(boolean selected) {
+            headerPanel.setBackground(selected ? COLOR_SELECTED : COLOR_BG);
+            if (isMainRow) toggleBtn.setBackground(selected ? COLOR_SELECTED : COLOR_BG);
+        }
 
-                nameField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(150, 150, 150)));
-                amountField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(150, 150, 150)));
-                nameField.requestFocusInWindow();
+        private void toggleExpand() {
+            if (!isMainRow) return;
+            isExpanded = !isExpanded;
+            childrenPanel.setVisible(isExpanded);
+            toggleBtn.setText(isExpanded ? "▼" : "▶");
+
+            listContainer.revalidate();
+            listContainer.repaint();
+        }
+
+        public void addSubBank(String name, String amount, String path) {
+            BankRow subRow = new BankRow(name, amount, path, false);
+            childrenPanel.add(subRow);
+            bankRows.add(subRow);
+
+            if (!isExpanded) toggleExpand();
+
+            calculateTotal();
+            listContainer.revalidate();
+            listContainer.repaint();
+        }
+
+        private void toggleEditMode() {
+            if (!isEditing) {
+                isEditing = true;
+                nameField.setEditable(true); amountField.setEditable(true);
+                nameField.setOpaque(true); amountField.setOpaque(true);
+                nameField.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
+                amountField.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
+                imgPlaceholder.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                editBtn.setText("Save"); editBtn.setBackground(new Color(0, 123, 255)); editBtn.setForeground(Color.WHITE);
             } else {
-                editButton.setText("Edit");
-                editButton.setBackground(new Color(233, 236, 239));
-                editButton.setForeground(COLOR_TEXT_MAIN);
+                isEditing = false;
+                nameField.setEditable(false); amountField.setEditable(false);
+                nameField.setOpaque(false); amountField.setOpaque(false);
+                nameField.setBorder(null); amountField.setBorder(null);
+                imgPlaceholder.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                editBtn.setText("Edit"); editBtn.setBackground(new Color(233, 236, 239)); editBtn.setForeground(COLOR_TEXT_MAIN);
+                calculateTotal();
+            }
+        }
 
-                nameField.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
-                amountField.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
+        public void updateRowImage(String path) {
+            this.imagePath = path;
+            ImageIcon icon = scaleIcon(path, 32, 32);
+            if (icon != null) { imgPlaceholder.setIcon(icon); imgPlaceholder.setText(""); }
+            else { imgPlaceholder.setIcon(null); imgPlaceholder.setText("img"); }
+
+            if (isMainRow && childrenPanel != null) {
+                for (Component child : childrenPanel.getComponents()) {
+                    if (child instanceof BankRow) {
+                        ((BankRow) child).updateRowImage(path);
+                    }
+                }
             }
         }
     }
