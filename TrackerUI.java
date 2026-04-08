@@ -18,7 +18,6 @@ public class TrackerUI extends JFrame {
 
     private final int ROW_HEIGHT = 50;
     private final int COL2_WIDTH = 150;
-    // Widened significantly to prevent any layout crunching
     private final int COL3_WIDTH = 230;
 
     private final Color COLOR_BG = Color.WHITE;
@@ -166,7 +165,6 @@ public class TrackerUI extends JFrame {
         b.setOpaque(true); b.setBorderPainted(false);
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Zeroed out padding so text ALWAYS fits
         b.setMargin(new Insets(0, 0, 0, 0));
         return b;
     }
@@ -290,16 +288,18 @@ public class TrackerUI extends JFrame {
             headerPanel.setPreferredSize(new Dimension(0, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10));
             headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10));
 
-            JPanel col1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
+            int verticalGap = isMainRow ? 8 : 4;
+
+            JPanel col1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, verticalGap));
             col1.setOpaque(false);
-            col1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
 
             if (!isMainRow) {
                 col1.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE),
-                        BorderFactory.createEmptyBorder(0, 40, 0, 0)
+                        BorderFactory.createEmptyBorder(0, 55, 0, 0)
                 ));
             } else {
+                col1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
                 toggleBtn = createFlatButton("▶", COLOR_BG, COLOR_TEXT_MAIN);
                 toggleBtn.setPreferredSize(new Dimension(45, 30));
                 toggleBtn.addActionListener(e -> toggleExpand());
@@ -323,7 +323,7 @@ public class TrackerUI extends JFrame {
 
             col1.add(imgPlaceholder); col1.add(nameField);
 
-            JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 8));
+            JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, verticalGap));
             col2.setOpaque(false);
             Dimension d2 = new Dimension(COL2_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10);
             col2.setPreferredSize(d2); col2.setMaximumSize(d2);
@@ -337,23 +337,21 @@ public class TrackerUI extends JFrame {
             amountField.setFont(FONT_BOLD);
             col2.add(amountField);
 
-            JPanel col3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 8));
+            JPanel col3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, verticalGap));
             col3.setOpaque(false);
             Dimension d3 = new Dimension(COL3_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10);
             col3.setPreferredSize(d3); col3.setMaximumSize(d3);
             col3.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_GRIDLINE));
 
             editBtn = createFlatButton("Edit", new Color(233, 236, 239), COLOR_TEXT_MAIN);
-            // FORCED specific sizes so Swing cannot shrink them
             editBtn.setPreferredSize(new Dimension(70, 28));
             editBtn.addActionListener(e -> toggleEditMode());
             col3.add(editBtn);
 
             if (isMainRow) {
                 JButton addSubBtn = createFlatButton("+ Sub", new Color(230, 245, 230), new Color(40, 167, 69));
-                // FORCED specific sizes so Swing cannot shrink them
                 addSubBtn.setPreferredSize(new Dimension(70, 28));
-                addSubBtn.addActionListener(e -> addSubBank("New Sub", "0.00", ""));
+                addSubBtn.addActionListener(e -> addSubBank("New Sub", "0.00", BankRow.this.imagePath));
                 col3.add(addSubBtn);
             }
 
@@ -435,6 +433,14 @@ public class TrackerUI extends JFrame {
             ImageIcon icon = scaleIcon(path, 32, 32);
             if (icon != null) { imgPlaceholder.setIcon(icon); imgPlaceholder.setText(""); }
             else { imgPlaceholder.setIcon(null); imgPlaceholder.setText("img"); }
+
+            if (isMainRow && childrenPanel != null) {
+                for (Component child : childrenPanel.getComponents()) {
+                    if (child instanceof BankRow) {
+                        ((BankRow) child).updateRowImage(path);
+                    }
+                }
+            }
         }
     }
 }
