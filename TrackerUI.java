@@ -23,7 +23,7 @@ public class TrackerUI extends JFrame {
     // The first column will be allowed to stretch dynamically!
     private final int ROW_HEIGHT = 50;
     private final int COL2_WIDTH = 150; // Amount
-    private final int COL3_WIDTH = 120; // Actions
+    private final int COL3_WIDTH = 150; // Actions
 
     // Color Palette
     private final Color COLOR_BG = Color.WHITE;
@@ -50,25 +50,25 @@ public class TrackerUI extends JFrame {
 
         // --- DASHBOARD PANEL ---
         JPanel dashboardPanel = new JPanel(new BorderLayout());
-        dashboardPanel.setBackground(COLOR_BG);
+        dashboardPanel.setBackground(Color.GREEN);
         dashboardPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // --- CENTER: Scrollable Table Data ---
+        //CENTER: Scrollable Table Data
         listContainer = new JPanel();
         listContainer.setLayout(new BoxLayout(listContainer, BoxLayout.Y_AXIS));
-        listContainer.setBackground(COLOR_BG);
+        listContainer.setBackground(Color.BLUE);
 
         JScrollPane scrollPane = new JScrollPane(listContainer);
         scrollPane.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        scrollPane.getViewport().setBackground(COLOR_BG);
+        //scrollPane.getViewport().setBackground(Color.RED);
 
         // --- BUILD THE TABLE HEADER ---
         JPanel headerRow = new JPanel();
         headerRow.setLayout(new BoxLayout(headerRow, BoxLayout.X_AXIS));
         headerRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Add headers. True = stretch to fill space, False = lock width.
+        // Headers
         headerRow.add(createHeaderCell("Bank Details", 0, true));
         headerRow.add(createHeaderCell("Amount", COL2_WIDTH, false));
         headerRow.add(createHeaderCell("Actions", COL3_WIDTH, false));
