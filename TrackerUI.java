@@ -1,9 +1,6 @@
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -24,11 +21,9 @@ public class TrackerUI extends JFrame {
     private final int COL3_WIDTH = 120;
 
     private final Color COLOR_BG = Color.WHITE;
-    private final Color COLOR_HOVER = new Color(245, 248, 250);
     private final Color COLOR_SELECTED = new Color(230, 238, 245);
     private final Color COLOR_TEXT_MAIN = new Color(33, 37, 41);
     private final Color COLOR_GRIDLINE = new Color(210, 210, 210);
-    private final Font FONT_MAIN = new Font("SansSerif", Font.PLAIN, 15);
     private final Font FONT_BOLD = new Font("SansSerif", Font.BOLD, 15);
 
     public TrackerUI() {
@@ -44,16 +39,13 @@ public class TrackerUI extends JFrame {
         setLayout(new BorderLayout());
         getContentPane().setBackground(COLOR_BG);
 
-        // 1. Initialize List Container
         listContainer = new JPanel();
         listContainer.setLayout(new BoxLayout(listContainer, BoxLayout.Y_AXIS));
         listContainer.setBackground(COLOR_BG);
 
-        // 2. RESTORE THE TAB LOOK (The "Dashboard" tab header)
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("SansSerif", Font.PLAIN, 13));
 
-        // This panel holds your original table content
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBackground(COLOR_BG);
         tablePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -71,16 +63,15 @@ public class TrackerUI extends JFrame {
 
         tablePanel.add(scrollPane, BorderLayout.CENTER);
 
-        // 3. RESTORE BOTTOM SPACING (Padding and Layout)
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         bottomPanel.setBackground(COLOR_BG);
-        bottomPanel.setBorder(new EmptyBorder(15, 0, 0, 0)); // Bottom area padding
+        bottomPanel.setBorder(new EmptyBorder(15, 0, 0, 0));
 
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         controls.setBackground(COLOR_BG);
         JButton addBtn = createFlatButton("+ Add Bank", new Color(240, 240, 240), COLOR_TEXT_MAIN);
-        addBtn.addActionListener(e -> addBankRow("New Bank", "", "", true));
+        addBtn.addActionListener(e -> addBankRow("New Bank", "0.00", "", true));
 
         JButton removeBtn = createFlatButton("- Remove Selected", new Color(255, 240, 240), new Color(200, 50, 50));
         removeBtn.addActionListener(e -> {
@@ -96,7 +87,7 @@ public class TrackerUI extends JFrame {
         totalLabel = new JLabel("Total Net: 0.00");
         totalLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
 
-        JButton saveBtn = createFlatButton("Save Data", new Color(40, 167, 69), Color.WHITE);
+        JButton saveBtn = createFlatButton("Save All Data", new Color(40, 167, 69), Color.WHITE);
         saveBtn.addActionListener(e -> saveUIStateToDatabase());
 
         totalsPanel.add(totalLabel, BorderLayout.WEST);
@@ -104,10 +95,8 @@ public class TrackerUI extends JFrame {
 
         bottomPanel.add(controls);
         bottomPanel.add(totalsPanel);
-
         tablePanel.add(bottomPanel, BorderLayout.SOUTH);
 
-        // Add the Dashboard panel into the TabbedPane to get that top "Dashboard" label back
         tabbedPane.addTab("Dashboard", tablePanel);
         add(tabbedPane, BorderLayout.CENTER);
 
@@ -122,12 +111,10 @@ public class TrackerUI extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    private void showEditPopup(BankRow row) {
-        JDialog dialog = new JDialog(this, "Edit Profile", true);
-        dialog.setLayout(new GridBagLayout());
+    private void showImagePopup(BankRow row) {
+        JDialog dialog = new JDialog(this, "Update Icon", true);
+        dialog.setLayout(new FlowLayout());
         dialog.getContentPane().setBackground(COLOR_BG);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(15, 15, 15, 15);
 
         JLabel preview = new JLabel("", SwingConstants.CENTER);
         preview.setPreferredSize(new Dimension(100, 100));
@@ -136,32 +123,17 @@ public class TrackerUI extends JFrame {
         if (icon != null) preview.setIcon(icon);
         else preview.setText("No Image");
 
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        JLabel title = new JLabel("Edit " + row.nameField.getText());
-        title.setFont(FONT_BOLD);
-        dialog.add(title, gbc);
-
-        gbc.gridy = 1;
-        dialog.add(preview, gbc);
-
-        JButton upload = createFlatButton("Change Image", new Color(0, 123, 255), Color.WHITE);
+        JButton upload = createFlatButton("Select Image File", new Color(0, 123, 255), Color.WHITE);
         upload.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
             if (fc.showOpenDialog(dialog) == JFileChooser.APPROVE_OPTION) {
-                String path = fc.getSelectedFile().getAbsolutePath();
-                row.updateRowImage(path);
-                preview.setIcon(scaleIcon(path, 100, 100));
-                preview.setText("");
+                row.updateRowImage(fc.getSelectedFile().getAbsolutePath());
+                dialog.dispose();
             }
         });
-        gbc.gridy = 2; gbc.gridwidth = 1;
-        dialog.add(upload, gbc);
 
-        JButton close = createFlatButton("Done", Color.GRAY, Color.WHITE);
-        close.addActionListener(e -> dialog.dispose());
-        gbc.gridx = 1;
-        dialog.add(close, gbc);
-
+        dialog.add(preview);
+        dialog.add(upload);
         dialog.pack();
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
@@ -188,7 +160,7 @@ public class TrackerUI extends JFrame {
 
     private JButton createFlatButton(String text, Color bg, Color fg) {
         JButton b = new JButton(text);
-        b.setFont(new Font("SansSerif", Font.BOLD, 12));
+        b.setFont(new Font("SansSerif", Font.BOLD, 11));
         b.setBackground(bg); b.setForeground(fg);
         b.setOpaque(true); b.setBorderPainted(false);
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -228,7 +200,7 @@ public class TrackerUI extends JFrame {
     private void loadDataIntoUI() {
         List<String[]> data = dbManager.loadAccounts();
         if (data.isEmpty()) {
-            addBankRow("Bank 1", "", "", true);
+            addBankRow("Bank 1", "0", "", false);
         } else {
             for (String[] d : data) addBankRow(d[0], d[1], d.length > 2 ? d[2] : "", false);
         }
@@ -243,7 +215,9 @@ public class TrackerUI extends JFrame {
     private class BankRow extends JPanel {
         JTextField nameField, amountField;
         JLabel imgPlaceholder;
+        JButton editBtn;
         String imagePath;
+        boolean isEditing = false;
 
         public BankRow(String name, String amount, String path) {
             this.imagePath = path;
@@ -251,22 +225,33 @@ public class TrackerUI extends JFrame {
             setBackground(COLOR_BG);
             setMaximumSize(new Dimension(Integer.MAX_VALUE, ROW_HEIGHT));
 
+            // Column 1: Image and Name
             JPanel col1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
             col1.setOpaque(false);
-            col1.setMaximumSize(new Dimension(Integer.MAX_VALUE, ROW_HEIGHT));
             col1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
 
             imgPlaceholder = new JLabel("", SwingConstants.CENTER);
             imgPlaceholder.setPreferredSize(new Dimension(32, 32));
             imgPlaceholder.setOpaque(true);
+
+            // Image is only clickable if isEditing is true
+            imgPlaceholder.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (isEditing) {
+                        showImagePopup(BankRow.this);
+                    }
+                }
+            });
             updateRowImage(path);
 
             nameField = new JTextField(name);
             nameField.setPreferredSize(new Dimension(200, 30));
             nameField.setBorder(null); nameField.setOpaque(false);
+            nameField.setEditable(false);
 
             col1.add(imgPlaceholder); col1.add(nameField);
 
+            // Column 2: Amount
             JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 8));
             col2.setOpaque(false);
             Dimension d2 = new Dimension(COL2_WIDTH, ROW_HEIGHT);
@@ -277,29 +262,63 @@ public class TrackerUI extends JFrame {
             amountField.setPreferredSize(new Dimension(110, 30));
             amountField.setHorizontalAlignment(JTextField.RIGHT);
             amountField.setBorder(null); amountField.setOpaque(false);
+            amountField.setEditable(false);
             amountField.setFont(FONT_BOLD);
-            amountField.getDocument().addDocumentListener(new DocumentListener() {
-                public void insertUpdate(DocumentEvent e) { calculateTotal(); }
-                public void removeUpdate(DocumentEvent e) { calculateTotal(); }
-                public void changedUpdate(DocumentEvent e) { calculateTotal(); }
-            });
             col2.add(amountField);
 
+            // Column 3: Edit Button
             JPanel col3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 8));
             col3.setOpaque(false);
             Dimension d3 = new Dimension(COL3_WIDTH, ROW_HEIGHT);
             col3.setPreferredSize(d3); col3.setMaximumSize(d3);
             col3.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_GRIDLINE));
 
-            JButton profileBtn = createFlatButton("Edit Profile", new Color(233, 236, 239), COLOR_TEXT_MAIN);
-            profileBtn.addActionListener(e -> showEditPopup(this));
-            col3.add(profileBtn);
+            editBtn = createFlatButton("Edit", new Color(233, 236, 239), COLOR_TEXT_MAIN);
+            editBtn.addActionListener(e -> toggleEditMode());
+            col3.add(editBtn);
 
             add(col1); add(col2); add(col3);
 
             this.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) { selectRow(BankRow.this); }
             });
+        }
+
+        private void toggleEditMode() {
+            if (!isEditing) {
+                // LOCK -> UNLOCK
+                isEditing = true;
+                nameField.setEditable(true);
+                amountField.setEditable(true);
+                nameField.setOpaque(true);
+                amountField.setOpaque(true);
+                nameField.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
+                amountField.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
+
+                imgPlaceholder.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                imgPlaceholder.setToolTipText("Click to change icon");
+
+                editBtn.setText("Save");
+                editBtn.setBackground(new Color(0, 123, 255));
+                editBtn.setForeground(Color.WHITE);
+            } else {
+                // UNLOCK -> LOCK
+                isEditing = false;
+                nameField.setEditable(false);
+                amountField.setEditable(false);
+                nameField.setOpaque(false);
+                amountField.setOpaque(false);
+                nameField.setBorder(null);
+                amountField.setBorder(null);
+
+                imgPlaceholder.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                imgPlaceholder.setToolTipText(null);
+
+                editBtn.setText("Edit");
+                editBtn.setBackground(new Color(233, 236, 239));
+                editBtn.setForeground(COLOR_TEXT_MAIN);
+                calculateTotal();
+            }
         }
 
         public void updateRowImage(String path) {
