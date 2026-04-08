@@ -18,7 +18,8 @@ public class TrackerUI extends JFrame {
 
     private final int ROW_HEIGHT = 50;
     private final int COL2_WIDTH = 150;
-    private final int COL3_WIDTH = 120;
+    // Widened significantly to prevent any layout crunching
+    private final int COL3_WIDTH = 230;
 
     private final Color COLOR_BG = Color.WHITE;
     private final Color COLOR_SELECTED = new Color(230, 238, 245);
@@ -164,11 +165,14 @@ public class TrackerUI extends JFrame {
         b.setBackground(bg); b.setForeground(fg);
         b.setOpaque(true); b.setBorderPainted(false);
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Zeroed out padding so text ALWAYS fits
+        b.setMargin(new Insets(0, 0, 0, 0));
         return b;
     }
 
     private void addBankRow(String name, String amount, String path, boolean edit) {
-        BankRow row = new BankRow(name, amount, path);
+        BankRow row = new BankRow(name, amount, path, true);
         bankRows.add(row);
         listContainer.add(row);
         calculateTotal();
@@ -178,7 +182,21 @@ public class TrackerUI extends JFrame {
 
     private void removeBankRow(BankRow row) {
         bankRows.remove(row);
-        listContainer.remove(row);
+
+        if (row.isMainRow) {
+            for (Component child : row.childrenPanel.getComponents()) {
+                if (child instanceof BankRow) {
+                    bankRows.remove((BankRow) child);
+                }
+            }
+            listContainer.remove(row);
+        } else {
+            Container parent = row.getParent();
+            if (parent != null) {
+                parent.remove(row);
+            }
+        }
+
         if (selectedRow == row) selectedRow = null;
         calculateTotal();
         listContainer.revalidate();
@@ -186,9 +204,9 @@ public class TrackerUI extends JFrame {
     }
 
     private void selectRow(BankRow row) {
-        if (selectedRow != null) selectedRow.setBackground(COLOR_BG);
+        if (selectedRow != null) selectedRow.setSelection(false);
         selectedRow = row;
-        if (selectedRow != null) selectedRow.setBackground(COLOR_SELECTED);
+        if (selectedRow != null) selectedRow.setSelection(true);
     }
 
     private void calculateTotal() {
@@ -200,15 +218,48 @@ public class TrackerUI extends JFrame {
     private void loadDataIntoUI() {
         List<String[]> data = dbManager.loadAccounts();
         if (data.isEmpty()) {
-            addBankRow("Bank 1", "0", "", false);
+            addBankRow("Bank 1", "0.00", "", false);
         } else {
-            for (String[] d : data) addBankRow(d[0], d[1], d.length > 2 ? d[2] : "", false);
+            BankRow currentMain = null;
+            for (String[] row : data) {
+                String parentId = row[1];
+                if (parentId.equals("0")) {
+                    currentMain = new BankRow(row[2], row[3], row[4], true);
+                    bankRows.add(currentMain);
+                    listContainer.add(currentMain);
+                } else if (currentMain != null) {
+                    currentMain.addSubBank(row[2], row[3], row[4]);
+                }
+            }
         }
+        calculateTotal();
+        listContainer.revalidate();
+        listContainer.repaint();
     }
 
     private void saveUIStateToDatabase() {
         List<String[]> toSave = new ArrayList<>();
-        for (BankRow r : bankRows) toSave.add(new String[]{r.nameField.getText(), r.amountField.getText(), r.imagePath});
+        int idCounter = 1;
+
+        for (Component c : listContainer.getComponents()) {
+            if (c instanceof BankRow) {
+                BankRow mainRow = (BankRow) c;
+                int mainId = idCounter++;
+                toSave.add(new String[]{
+                        String.valueOf(mainId), "0", mainRow.nameField.getText(), mainRow.amountField.getText(), mainRow.imagePath
+                });
+
+                for (Component child : mainRow.childrenPanel.getComponents()) {
+                    if (child instanceof BankRow) {
+                        BankRow subRow = (BankRow) child;
+                        int subId = idCounter++;
+                        toSave.add(new String[]{
+                                String.valueOf(subId), String.valueOf(mainId), subRow.nameField.getText(), subRow.amountField.getText(), subRow.imagePath
+                        });
+                    }
+                }
+            }
+        }
         try { dbManager.saveAccounts(toSave); } catch (Exception ignored) {}
     }
 
@@ -216,45 +267,65 @@ public class TrackerUI extends JFrame {
         JTextField nameField, amountField;
         JLabel imgPlaceholder;
         JButton editBtn;
+        JButton toggleBtn;
         String imagePath;
         boolean isEditing = false;
+        boolean isMainRow;
 
-        public BankRow(String name, String amount, String path) {
+        JPanel headerPanel;
+        JPanel childrenPanel;
+        boolean isExpanded = false;
+
+        public BankRow(String name, String amount, String path, boolean isMainRow) {
             this.imagePath = path;
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            setBackground(COLOR_BG);
-            setMaximumSize(new Dimension(Integer.MAX_VALUE, ROW_HEIGHT));
+            this.isMainRow = isMainRow;
 
-            // Column 1: Image and Name
+            setLayout(new BorderLayout());
+            setBackground(COLOR_BG);
+
+            headerPanel = new JPanel();
+            headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.X_AXIS));
+            headerPanel.setBackground(COLOR_BG);
+
+            headerPanel.setPreferredSize(new Dimension(0, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10));
+            headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10));
+
             JPanel col1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
             col1.setOpaque(false);
             col1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
 
+            if (!isMainRow) {
+                col1.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE),
+                        BorderFactory.createEmptyBorder(0, 40, 0, 0)
+                ));
+            } else {
+                toggleBtn = createFlatButton("▶", COLOR_BG, COLOR_TEXT_MAIN);
+                toggleBtn.setPreferredSize(new Dimension(45, 30));
+                toggleBtn.addActionListener(e -> toggleExpand());
+                col1.add(toggleBtn);
+            }
+
             imgPlaceholder = new JLabel("", SwingConstants.CENTER);
             imgPlaceholder.setPreferredSize(new Dimension(32, 32));
             imgPlaceholder.setOpaque(true);
-
-            // Image is only clickable if isEditing is true
             imgPlaceholder.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
-                    if (isEditing) {
-                        showImagePopup(BankRow.this);
-                    }
+                    if (isEditing) showImagePopup(BankRow.this);
                 }
             });
             updateRowImage(path);
 
             nameField = new JTextField(name);
-            nameField.setPreferredSize(new Dimension(200, 30));
+            nameField.setPreferredSize(new Dimension(160, 30));
             nameField.setBorder(null); nameField.setOpaque(false);
             nameField.setEditable(false);
 
             col1.add(imgPlaceholder); col1.add(nameField);
 
-            // Column 2: Amount
             JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 8));
             col2.setOpaque(false);
-            Dimension d2 = new Dimension(COL2_WIDTH, ROW_HEIGHT);
+            Dimension d2 = new Dimension(COL2_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10);
             col2.setPreferredSize(d2); col2.setMaximumSize(d2);
             col2.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
 
@@ -266,57 +337,95 @@ public class TrackerUI extends JFrame {
             amountField.setFont(FONT_BOLD);
             col2.add(amountField);
 
-            // Column 3: Edit Button
             JPanel col3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 8));
             col3.setOpaque(false);
-            Dimension d3 = new Dimension(COL3_WIDTH, ROW_HEIGHT);
+            Dimension d3 = new Dimension(COL3_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10);
             col3.setPreferredSize(d3); col3.setMaximumSize(d3);
             col3.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_GRIDLINE));
 
             editBtn = createFlatButton("Edit", new Color(233, 236, 239), COLOR_TEXT_MAIN);
+            // FORCED specific sizes so Swing cannot shrink them
+            editBtn.setPreferredSize(new Dimension(70, 28));
             editBtn.addActionListener(e -> toggleEditMode());
             col3.add(editBtn);
 
-            add(col1); add(col2); add(col3);
+            if (isMainRow) {
+                JButton addSubBtn = createFlatButton("+ Sub", new Color(230, 245, 230), new Color(40, 167, 69));
+                // FORCED specific sizes so Swing cannot shrink them
+                addSubBtn.setPreferredSize(new Dimension(70, 28));
+                addSubBtn.addActionListener(e -> addSubBank("New Sub", "0.00", ""));
+                col3.add(addSubBtn);
+            }
 
-            this.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) { selectRow(BankRow.this); }
+            headerPanel.add(col1); headerPanel.add(col2); headerPanel.add(col3);
+            add(headerPanel, BorderLayout.NORTH);
+
+            if (isMainRow) {
+                childrenPanel = new JPanel();
+                childrenPanel.setLayout(new BoxLayout(childrenPanel, BoxLayout.Y_AXIS));
+                childrenPanel.setBackground(COLOR_BG);
+                childrenPanel.setVisible(false);
+                add(childrenPanel, BorderLayout.CENTER);
+            }
+
+            headerPanel.addMouseListener(new MouseAdapter() {
+                public void mousePressed(MouseEvent e) {
+                    selectRow(BankRow.this);
+                    if (isMainRow && !isEditing) {
+                        toggleExpand();
+                    }
+                }
             });
+        }
+
+        @Override
+        public Dimension getMaximumSize() {
+            return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+        }
+
+        public void setSelection(boolean selected) {
+            headerPanel.setBackground(selected ? COLOR_SELECTED : COLOR_BG);
+            if (isMainRow) toggleBtn.setBackground(selected ? COLOR_SELECTED : COLOR_BG);
+        }
+
+        private void toggleExpand() {
+            if (!isMainRow) return;
+            isExpanded = !isExpanded;
+            childrenPanel.setVisible(isExpanded);
+            toggleBtn.setText(isExpanded ? "▼" : "▶");
+
+            listContainer.revalidate();
+            listContainer.repaint();
+        }
+
+        public void addSubBank(String name, String amount, String path) {
+            BankRow subRow = new BankRow(name, amount, path, false);
+            childrenPanel.add(subRow);
+            bankRows.add(subRow);
+
+            if (!isExpanded) toggleExpand();
+
+            calculateTotal();
+            listContainer.revalidate();
+            listContainer.repaint();
         }
 
         private void toggleEditMode() {
             if (!isEditing) {
-                // LOCK -> UNLOCK
                 isEditing = true;
-                nameField.setEditable(true);
-                amountField.setEditable(true);
-                nameField.setOpaque(true);
-                amountField.setOpaque(true);
+                nameField.setEditable(true); amountField.setEditable(true);
+                nameField.setOpaque(true); amountField.setOpaque(true);
                 nameField.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
                 amountField.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
-
                 imgPlaceholder.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                imgPlaceholder.setToolTipText("Click to change icon");
-
-                editBtn.setText("Save");
-                editBtn.setBackground(new Color(0, 123, 255));
-                editBtn.setForeground(Color.WHITE);
+                editBtn.setText("Save"); editBtn.setBackground(new Color(0, 123, 255)); editBtn.setForeground(Color.WHITE);
             } else {
-                // UNLOCK -> LOCK
                 isEditing = false;
-                nameField.setEditable(false);
-                amountField.setEditable(false);
-                nameField.setOpaque(false);
-                amountField.setOpaque(false);
-                nameField.setBorder(null);
-                amountField.setBorder(null);
-
+                nameField.setEditable(false); amountField.setEditable(false);
+                nameField.setOpaque(false); amountField.setOpaque(false);
+                nameField.setBorder(null); amountField.setBorder(null);
                 imgPlaceholder.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                imgPlaceholder.setToolTipText(null);
-
-                editBtn.setText("Edit");
-                editBtn.setBackground(new Color(233, 236, 239));
-                editBtn.setForeground(COLOR_TEXT_MAIN);
+                editBtn.setText("Edit"); editBtn.setBackground(new Color(233, 236, 239)); editBtn.setForeground(COLOR_TEXT_MAIN);
                 calculateTotal();
             }
         }

@@ -3,61 +3,83 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager {
-
+    // This creates 'bank_tracker.db' in your project's root folder
     private static final String DB_URL = "jdbc:sqlite:bank_tracker.db";
 
     public DatabaseManager() {
-        initDatabase();
+        try {
+            // CRITICAL: This loads the local SQLite driver
+            Class.forName("org.sqlite.JDBC");
+            initDatabase();
+        } catch (ClassNotFoundException e) {
+            System.err.println("SQLite Driver not found! Ensure the JAR is in your project libraries.");
+        }
     }
 
     private void initDatabase() {
+        // Created 'accounts_v2' to support the new parent_id structure without breaking older local databases
+        String sql = "CREATE TABLE IF NOT EXISTS accounts_v2 (" +
+                "id INTEGER PRIMARY KEY, " +
+                "parent_id INTEGER, " +
+                "bank_name TEXT, " +
+                "amount TEXT, " +
+                "image_path TEXT)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
-            // Added image_path column to the schema
-            String sql = "CREATE TABLE IF NOT EXISTS bank_accounts (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "bank_name TEXT, " +
-                    "amount TEXT, " +
-                    "image_path TEXT)";
             stmt.execute(sql);
         } catch (SQLException e) {
-            System.out.println("Error initializing database: " + e.getMessage());
+            System.err.println("DB Initialization failed: " + e.getMessage());
         }
     }
 
     public List<String[]> loadAccounts() {
         List<String[]> accounts = new ArrayList<>();
+        String query = "SELECT id, parent_id, bank_name, amount, image_path FROM accounts_v2 ORDER BY id";
+
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT bank_name, amount, image_path FROM bank_accounts ORDER BY id")) {
+             ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
                 accounts.add(new String[]{
+                        String.valueOf(rs.getInt("id")),
+                        String.valueOf(rs.getInt("parent_id")),
                         rs.getString("bank_name"),
                         rs.getString("amount"),
-                        rs.getString("image_path")
+                        rs.getString("image_path") != null ? rs.getString("image_path") : ""
                 });
             }
         } catch (SQLException e) {
-            System.out.println("Error loading database: " + e.getMessage());
+            System.err.println("Error loading data: " + e.getMessage());
         }
         return accounts;
     }
 
     public void saveAccounts(List<String[]> accounts) throws SQLException {
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             Statement stmt = conn.createStatement()) {
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            // Start a transaction for safe local saving
+            conn.setAutoCommit(false);
 
-            stmt.executeUpdate("DELETE FROM bank_accounts");
+            try (Statement deleteStmt = conn.createStatement()) {
+                // Clear old data
+                deleteStmt.executeUpdate("DELETE FROM accounts_v2");
 
-            String insertSql = "INSERT INTO bank_accounts (bank_name, amount, image_path) VALUES (?, ?, ?)";
-            try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
-                for (String[] acc : accounts) {
-                    pstmt.setString(1, acc[0]);
-                    pstmt.setString(2, acc[1]);
-                    pstmt.setString(3, (acc.length > 2 && acc[2] != null) ? acc[2] : "");
-                    pstmt.executeUpdate();
+                String insertSql = "INSERT INTO accounts_v2 (id, parent_id, bank_name, amount, image_path) VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
+                    for (String[] acc : accounts) {
+                        pstmt.setInt(1, Integer.parseInt(acc[0])); // id
+                        pstmt.setInt(2, Integer.parseInt(acc[1])); // parent_id
+                        pstmt.setString(3, acc[2]);                // bank_name
+                        pstmt.setString(4, acc[3]);                // amount
+                        pstmt.setString(5, (acc.length > 4) ? acc[4] : ""); // image_path
+                        pstmt.executeUpdate();
+                    }
                 }
+                // CRITICAL: This pushes the data from memory to the local .db file
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
         }
     }
