@@ -119,9 +119,49 @@ public class TrackerUI extends JFrame {
         JLabel preview = new JLabel("", SwingConstants.CENTER);
         preview.setPreferredSize(new Dimension(100, 100));
         preview.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
-        ImageIcon icon = scaleIcon(row.imagePath, 100, 100);
-        if (icon != null) preview.setIcon(icon);
-        else preview.setText("No Image");
+
+
+        ImageIcon currentIcon = scaleIcon(row.imagePath, 100, 100);
+        if (currentIcon != null) {
+            preview.setIcon(currentIcon);
+        } else {
+            preview.setText("No Image");
+        }
+
+
+        String gcashPath = "Default Bank Images/Gcash.png";
+        ImageIcon gcashIcon = scaleIcon(gcashPath, 100, 100);
+        JButton gcashBtn = new JButton(gcashIcon);
+        gcashBtn.addActionListener(e -> {
+            row.updateRowImage(gcashPath);
+            dialog.dispose();
+        });
+
+        String gotymePath = "Default Bank Images/GoTyme.png";
+        ImageIcon gotymeIcon = scaleIcon(gotymePath, 100, 100);
+        JButton gotymeButton = new JButton(gotymeIcon);
+        gotymeButton.addActionListener(e -> {
+            row.updateRowImage(gotymePath);
+            dialog.dispose();
+        });
+
+        String mariBankPath = "Default Bank Images/MariBank.png";
+        ImageIcon mariBankIcon = scaleIcon(mariBankPath, 100, 100);
+        JButton mariBankBtn = new JButton(mariBankIcon);
+        mariBankBtn.addActionListener(e -> {
+            row.updateRowImage(mariBankPath);
+            dialog.dispose();
+        });
+
+        String payMayaPath = "Default Bank Images/PayMaya.png";
+        ImageIcon mayaIcon = scaleIcon(payMayaPath, 100, 100);
+        JButton mayaBtn = new JButton(mayaIcon);
+        mayaBtn.addActionListener(e -> {
+            row.updateRowImage(payMayaPath);
+            dialog.dispose();
+        });
+
+
 
         JButton upload = createFlatButton("Select Image File", new Color(0, 123, 255), Color.WHITE);
         upload.addActionListener(e -> {
@@ -132,12 +172,53 @@ public class TrackerUI extends JFrame {
             }
         });
 
+
         dialog.add(preview);
+        dialog.add(gcashBtn);
+        dialog.add(mayaBtn);
+        dialog.add(mariBankBtn);
+        dialog.add(gotymeButton);
         dialog.add(upload);
+
         dialog.pack();
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
+
+//    private void showImagePopup(BankRow row) {
+//        JDialog dialog = new JDialog(this, "Update Icon", true);
+//        dialog.setLayout(new FlowLayout());
+//        dialog.getContentPane().setBackground(COLOR_BG);
+//
+//        JLabel preview = new JLabel("", SwingConstants.CENTER);
+//        preview.setPreferredSize(new Dimension(100, 100));
+//        preview.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
+//        ImageIcon icon = scaleIcon(row.imagePath, 100, 100);
+//        if (icon != null) preview.setIcon(icon);
+//        else preview.setText("No Image");
+//
+//        ImageIcon icon1 = scaleIcon(row.imagePath, 100, 100);
+//        icon1 = new ImageIcon("Default Bank Images/Gcash.png");
+//        if (icon != null) preview.setIcon(icon);
+//        else preview.setText("No Image");
+//        JButton im1 = new JButton(icon1);
+//
+//
+//        JButton upload = createFlatButton("Select Image File", new Color(0, 123, 255), Color.WHITE);
+//        upload.addActionListener(e -> {
+//            JFileChooser fc = new JFileChooser();
+//            if (fc.showOpenDialog(dialog) == JFileChooser.APPROVE_OPTION) {
+//                row.updateRowImage(fc.getSelectedFile().getAbsolutePath());
+//                dialog.dispose();
+//            }
+//        });
+//
+//        dialog.add(preview);
+//        dialog.add(upload);
+//        dialog.pack();
+//        dialog.setLocationRelativeTo(this);
+//        dialog.setVisible(true);
+//    }
 
     private ImageIcon scaleIcon(String path, int w, int h) {
         if (path == null || path.isEmpty()) return null;
