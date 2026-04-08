@@ -26,16 +26,6 @@ public class DatabaseManager {
                 "image_path TEXT)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
-<<<<<<< HEAD
-
-            String sql = "CREATE TABLE IF NOT EXISTS bank_accounts (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "bank_name TEXT, " +
-                    "amount TEXT, " +
-                    "image_path TEXT)";
-=======
->>>>>>> Lopez
-            stmt.execute(sql);
         } catch (SQLException e) {
             System.err.println("DB Initialization failed: " + e.getMessage());
         }

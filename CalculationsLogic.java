@@ -10,7 +10,7 @@ public class CalculationsLogic {
         this.subBal = subBal;
         this.totalBal = totalBal;
     }
- 
+
     public CalculationsLogic() {
         this.subBal = 0.0;
         this.totalBal = 0.0;
