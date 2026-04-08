@@ -26,6 +26,7 @@ public class DatabaseManager {
                 "image_path TEXT)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
         } catch (SQLException e) {
             System.err.println("DB Initialization failed: " + e.getMessage());
         }
