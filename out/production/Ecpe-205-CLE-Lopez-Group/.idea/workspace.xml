@@ -4,44 +4,33 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3dde4266-454d-46dd-b391-c300664d46fe" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Ecpe-205-CLE-Lopez-Group.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Ecpe-205-CLE-Lopez-Group.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TrackerUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/TrackerUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bank_tracker.db" beforeDir="false" afterPath="$PROJECT_DIR$/bank_tracker.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/workspace.xml" beforeDir="false" />
+    <list default="true" id="732395d6-000f-4ae7-9d39-aa392a384c22" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Class" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "JohnRayIno"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Barryy2&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Barryy2/Ecpe-205-CLE-Lopez-Group.git",
-    "accountId": "99a5c320-2e37-4ff8-9519-3461138161ba"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Barryy2/Ecpe-205-CLE-Lopez-Group.git&quot;,
+    &quot;accountId&quot;: &quot;2875647f-b4ef-472e-a6dd-38d82a485729&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 8
-}]]></component>
-  <component name="ProjectId" id="3C3u2Q3MhGjBV0ZBf5nGV95z8dB" />
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="3C3oTn6N3YOCtKzg4OcRXeQQsax" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -51,20 +40,20 @@
     "Application.Main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "inocencio__branch",
+    "git-widget-placeholder": "Lopez",
     "kotlin-language-version-configured": "true",
     "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2"
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0"
   }
 }]]></component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="3dde4266-454d-46dd-b391-c300664d46fe" name="Changes" comment="" />
-      <created>1775626366842</created>
+      <changelist id="732395d6-000f-4ae7-9d39-aa392a384c22" name="Changes" comment="" />
+      <created>1775623624643</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1775626366842</updated>
+      <updated>1775623624643</updated>
     </task>
     <servers />
   </component>
