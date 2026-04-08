@@ -2,16 +2,15 @@ import java.util.List;
 
 public class CalculationsLogic {
 
-
     private double subBal;
     private double totalBal;
 
+    // Constructor
     public CalculationsLogic(double subBal, double totalBal) {
         this.subBal = subBal;
         this.totalBal = totalBal;
     }
-
-
+ 
     public CalculationsLogic() {
         this.subBal = 0.0;
         this.totalBal = 0.0;
@@ -26,7 +25,6 @@ public class CalculationsLogic {
         return totalBal;
     }
 
-
     public void setSubBal(double subBal) {
         this.subBal = subBal;
     }
@@ -34,8 +32,6 @@ public class CalculationsLogic {
     public void setTotalBal(double totalBal) {
         this.totalBal = totalBal;
     }
-
-
 
     public double computeTotalAssets(List<String> amounts) {
         double total = 0.0;
@@ -50,6 +46,7 @@ public class CalculationsLogic {
                 }
             }
         }
+
 
         this.totalBal = total;
         return this.totalBal;
