@@ -3,12 +3,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager {
-    // This creates 'bank_tracker.db' in your project's root folder
+
     private static final String DB_URL = "jdbc:sqlite:bank_tracker.db";
 
     public DatabaseManager() {
         try {
-            // CRITICAL: This loads the local SQLite driver
+
             Class.forName("org.sqlite.JDBC");
             initDatabase();
         } catch (ClassNotFoundException e) {
@@ -17,7 +17,7 @@ public class DatabaseManager {
     }
 
     private void initDatabase() {
-        // Created 'accounts_v2' to support the new parent_id structure without breaking older local databases
+
         String sql = "CREATE TABLE IF NOT EXISTS accounts_v2 (" +
                 "id INTEGER PRIMARY KEY, " +
                 "parent_id INTEGER, " +
@@ -56,11 +56,11 @@ public class DatabaseManager {
 
     public void saveAccounts(List<String[]> accounts) throws SQLException {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            // Start a transaction for safe local saving
+
             conn.setAutoCommit(false);
 
             try (Statement deleteStmt = conn.createStatement()) {
-                // Clear old data
+
                 deleteStmt.executeUpdate("DELETE FROM accounts_v2");
 
                 String insertSql = "INSERT INTO accounts_v2 (id, parent_id, bank_name, amount, image_path) VALUES (?, ?, ?, ?, ?)";
@@ -74,7 +74,7 @@ public class DatabaseManager {
                         pstmt.executeUpdate();
                     }
                 }
-                // CRITICAL: This pushes the data from memory to the local .db file
+
                 conn.commit();
             } catch (SQLException e) {
                 conn.rollback();

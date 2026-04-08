@@ -2,28 +2,24 @@ import javax.swing.*;
 import java.util.List;
 
 public class CalculationsLogic {
-    /**
-     * Compute Total Assets
-     * Auto update asset when value changes
-     * Validation of calculations
-     */
+
 
     private double subBal;      // Used for sub accounts
     private double totalBal;    // Used for total net
 
-    // Constructor
+
     public CalculationsLogic(double subBal, double totalBal) {
         this.subBal = subBal;
         this.totalBal = totalBal;
     }
 
-    // Empty constructor to start at 0
+
     public CalculationsLogic() {
         this.subBal = 0.0;
         this.totalBal = 0.0;
     }
 
-    // Getters
+
     public double getSubBal() {
         return subBal;
     }
@@ -32,7 +28,7 @@ public class CalculationsLogic {
         return totalBal;
     }
 
-    // Setters
+
     public void setSubBal(double subBal) {
         this.subBal = subBal;
     }
@@ -41,17 +37,13 @@ public class CalculationsLogic {
         this.totalBal = totalBal;
     }
 
-    // --- NEW COMPUTATION METHOD ---
-    /**
-     * Takes a list of strings from the UI, validates them, and computes the total.
-     */
+
     public double computeTotalAssets(List<String> amounts) {
         double total = 0.0;
         for (String text : amounts) {
-            // Strip away letters/symbols, keep only numbers and decimals
+
             String cleanText = text.replaceAll("[^\\d.]", "#").trim();
 
-            // Checks if it did contain letters/symbols
             if (cleanText.contains("#")){
                 JOptionPane.showMessageDialog(null, "Contains non-numeric values, please try again.");
                 return totalBal;
@@ -73,12 +65,12 @@ public class CalculationsLogic {
                 try {
                     total += Double.parseDouble(cleanText);
                 } catch (NumberFormatException ignored) {
-                    // Ignore if they typed multiple decimals like "12..50"
+
                 }
             }
         }
 
-        // Update the class variable and return the result
+
         this.totalBal = total;
         return this.totalBal;
     }
