@@ -13,7 +13,7 @@ public class DatabaseManager {
     private void initDatabase() {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
-            // Added image_path column to the schema
+
             String sql = "CREATE TABLE IF NOT EXISTS bank_accounts (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "bank_name TEXT, " +
