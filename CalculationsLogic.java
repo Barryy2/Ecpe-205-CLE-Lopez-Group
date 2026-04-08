@@ -57,6 +57,18 @@ public class CalculationsLogic {
                 return totalBal;
             }
 
+            int dec = 0;
+            for (char c : cleanText.toCharArray()){
+                if (c == '.'){
+                    dec++;
+                }
+
+                if (dec > 1){
+                    JOptionPane.showMessageDialog(null, "Amount entered contains too many decimals, please try again.");
+                    return totalBal;
+                }
+            }
+
             if (!cleanText.isEmpty()) {
                 try {
                     total += Double.parseDouble(cleanText);
