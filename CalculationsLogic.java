@@ -4,8 +4,8 @@ import java.util.List;
 public class CalculationsLogic {
 
 
-    private double subBal;      // Used for sub accounts
-    private double totalBal;    // Used for total net
+    private double subBal;
+    private double totalBal;
 
 
     public CalculationsLogic(double subBal, double totalBal) {

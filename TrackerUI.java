@@ -166,9 +166,18 @@ public class TrackerUI extends JFrame {
         JButton upload = createFlatButton("Select Image File", new Color(0, 123, 255), Color.WHITE);
         upload.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
             if (fc.showOpenDialog(dialog) == JFileChooser.APPROVE_OPTION) {
-                row.updateRowImage(fc.getSelectedFile().getAbsolutePath());
-                dialog.dispose();
+                String filePath = fc.getSelectedFile().getAbsolutePath();
+                verifyFileImage.VerificationResult result = verifyFileImage.verifyImageFile(filePath);
+                
+                if (result.isValid) {
+                    row.updateRowImage(filePath);
+                    JOptionPane.showMessageDialog(dialog, result.message, "Image Verified", JOptionPane.INFORMATION_MESSAGE);
+                    dialog.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(dialog, result.message, "Invalid Image File", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
