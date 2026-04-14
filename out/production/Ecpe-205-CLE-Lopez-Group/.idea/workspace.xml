@@ -4,8 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="732395d6-000f-4ae7-9d39-aa392a384c22" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/workspace.xml" afterDir="false" />
+=======
+    <list default="true" id="a661c788-1119-4f99-b8b2-b10c2911d068" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/CalculationsLogic.java" beforeDir="false" afterPath="$PROJECT_DIR$/CalculationsLogic.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DatabaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/DatabaseManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TrackerUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/TrackerUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bank_tracker.db" beforeDir="false" afterPath="$PROJECT_DIR$/bank_tracker.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/bank_tracker.db" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/bank_tracker.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/verifyFileImage.java" beforeDir="false" afterPath="$PROJECT_DIR$/verifyFileImage.java" afterDir="false" />
+>>>>>>> 8709179b58aaf3bbb0adb6dbdbbf3146ecfafe4e
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,12 +29,17 @@
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
     &quot;state&quot;: &quot;OPEN&quot;,
+<<<<<<< HEAD
     &quot;assignee&quot;: &quot;Barryy2&quot;
+=======
+    &quot;assignee&quot;: &quot;JohnRayIno&quot;
+>>>>>>> 8709179b58aaf3bbb0adb6dbdbbf3146ecfafe4e
   }
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Barryy2/Ecpe-205-CLE-Lopez-Group.git&quot;,
+<<<<<<< HEAD
     &quot;accountId&quot;: &quot;2875647f-b4ef-472e-a6dd-38d82a485729&quot;
   }
 }</component>
@@ -31,10 +47,20 @@
   &quot;associatedIndex&quot;: 0
 }</component>
   <component name="ProjectId" id="3C3oTn6N3YOCtKzg4OcRXeQQsax" />
+=======
+    &quot;accountId&quot;: &quot;a489ee4a-9b1c-43ee-b30c-49070745f542&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="3CFjm8CEcRi52PHs28hs0uaIvz9" />
+>>>>>>> 8709179b58aaf3bbb0adb6dbdbbf3146ecfafe4e
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+<<<<<<< HEAD
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.Main.executor": "Run",
@@ -45,15 +71,34 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.0"
+=======
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;inocencio__branch&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Blokoy/Desktop/CLE WORK/Ecpe-205-CLE-Lopez-Group&quot;
+>>>>>>> 8709179b58aaf3bbb0adb6dbdbbf3146ecfafe4e
   }
-}]]></component>
+}</component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
+<<<<<<< HEAD
       <changelist id="732395d6-000f-4ae7-9d39-aa392a384c22" name="Changes" comment="" />
       <created>1775623624643</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1775623624643</updated>
+=======
+      <changelist id="a661c788-1119-4f99-b8b2-b10c2911d068" name="Changes" comment="" />
+      <created>1775988368225</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1775988368225</updated>
+>>>>>>> 8709179b58aaf3bbb0adb6dbdbbf3146ecfafe4e
     </task>
     <servers />
   </component>
