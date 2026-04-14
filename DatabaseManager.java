@@ -8,7 +8,7 @@ public class DatabaseManager {
 
     public DatabaseManager() {
         try {
-            // CRITICAL: This loads the local SQLite driver
+
             Class.forName("org.sqlite.JDBC");
             initDatabase();
         } catch (ClassNotFoundException e) {
@@ -57,11 +57,11 @@ public class DatabaseManager {
 
     public void saveAccounts(List<String[]> accounts) throws SQLException {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            // Start a transaction for safe local saving
+
             conn.setAutoCommit(false);
 
             try (Statement deleteStmt = conn.createStatement()) {
-                // Clear old data
+
                 deleteStmt.executeUpdate("DELETE FROM accounts_v2");
 
                 String insertSql = "INSERT INTO accounts_v2 (id, parent_id, bank_name, amount, image_path) VALUES (?, ?, ?, ?, ?)";

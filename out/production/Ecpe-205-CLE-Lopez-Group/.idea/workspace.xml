@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a661c788-1119-4f99-b8b2-b10c2911d068" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/CalculationsLogic.java" beforeDir="false" afterPath="$PROJECT_DIR$/CalculationsLogic.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DatabaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/DatabaseManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TrackerUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/TrackerUI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bank_tracker.db" beforeDir="false" afterPath="$PROJECT_DIR$/bank_tracker.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/workspace.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/bank_tracker.db" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/bank_tracker.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/verifyFileImage.java" beforeDir="false" afterPath="$PROJECT_DIR$/verifyFileImage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
