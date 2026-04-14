@@ -334,7 +334,7 @@ public class TrackerUI extends JFrame {
 
             toggleEditMode(startInEditMode);
 
-            // Hover and Selection logic
+            // Hover and Selection logic.
             MouseAdapter mouseAction = new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) { selectRow(BankRow.this); }

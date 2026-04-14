@@ -58,7 +58,7 @@ public class CalculationsLogic {
             }
         }
 
-        // Update the class variable and return the result
+        // Update the class variable and return the result.
         this.totalBal = total;
         return this.totalBal;
     }

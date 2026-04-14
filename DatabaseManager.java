@@ -26,7 +26,7 @@ public class DatabaseManager {
         }
     }
 
-    /**
+    /**.
      * Loads accounts from the database.
      * @return A list of string arrays. Index 0 is the bank name, Index 1 is the amount.
      */
