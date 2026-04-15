@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="732395d6-000f-4ae7-9d39-aa392a384c22" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/TrackerUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/TrackerUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/CalculationsLogic.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/CalculationsLogic.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/DatabaseManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/DatabaseManager.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$3.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/bank_tracker.db" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/bank_tracker.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/verifyFileImage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/verifyFileImage.class" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Barryy2&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Barryy2/Ecpe-205-CLE-Lopez-Group.git&quot;,
+    &quot;accountId&quot;: &quot;2875647f-b4ef-472e-a6dd-38d82a485729&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="3C3oTn6N3YOCtKzg4OcRXeQQsax" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Lopez&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
+  }
+}</component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="732395d6-000f-4ae7-9d39-aa392a384c22" name="Changes" comment="" />
+      <created>1775623624643</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1775623624643</updated>
+    </task>
+    <servers />
+  </component>
+</project>
