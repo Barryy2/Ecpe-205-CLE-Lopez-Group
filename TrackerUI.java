@@ -58,16 +58,17 @@ public class TrackerUI extends JFrame {
 
         // DASHBOARD PANEL
         JPanel dashboardPanel = new JPanel(new BorderLayout());
-        dashboardPanel.setBackground(COLOR_BG);
+        dashboardPanel.setBackground(Color.GREEN);
         dashboardPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // CENTER: Scrollable Table Data
         listContainer = new JPanel();
         listContainer.setLayout(new BoxLayout(listContainer, BoxLayout.Y_AXIS));
-        listContainer.setOpaque(false);
+        listContainer.setBackground(Color.BLUE);
+        listContainer.setOpaque(true);
 
         JPanel backgroundWrapper = new JPanel(new BorderLayout());
-        backgroundWrapper.setBackground(COLOR_BG);
+        backgroundWrapper.setBackground(Color.BLUE);
         backgroundWrapper.add(listContainer, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(backgroundWrapper);
