@@ -3,6 +3,10 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -13,7 +17,9 @@ public class TrackerUI extends JFrame {
     private final JPanel listContainer;
     private final List<BankRow> bankRows = new ArrayList<>();
     private JLabel totalLabel;
-    private BankRow selectedRow = null;
+
+    // Tracks a list of selections
+    private final List<BankRow> selectedRows = new ArrayList<>();
 
     // Database and Logic instances
     private final DatabaseManager dbManager;
@@ -60,7 +66,6 @@ public class TrackerUI extends JFrame {
         listContainer.setLayout(new BoxLayout(listContainer, BoxLayout.Y_AXIS));
         listContainer.setOpaque(false);
 
-        //
         JPanel backgroundWrapper = new JPanel(new BorderLayout());
         backgroundWrapper.setBackground(COLOR_BG);
         backgroundWrapper.add(listContainer, BorderLayout.NORTH);
@@ -94,8 +99,11 @@ public class TrackerUI extends JFrame {
 
         JButton minusButton = createFlatButton("- Remove Selected", new Color(255, 240, 240), new Color(200, 50, 50));
         minusButton.addActionListener(e -> {
-            if (selectedRow != null) {
-                removeBankRow(selectedRow);
+            if (!selectedRows.isEmpty()) {
+                List<BankRow> copyToRemove = new ArrayList<>(selectedRows);
+                for (BankRow row : copyToRemove) {
+                    removeBankRow(row);
+                }
             }
         });
 
@@ -253,7 +261,11 @@ public class TrackerUI extends JFrame {
         BankRow row = new BankRow(name, amount, path, true);
         bankRows.add(row);
         listContainer.add(row);
-        selectRow(row);
+
+        clearSelection();
+        selectedRows.add(row);
+        row.setSelection(true);
+
         calculateTotal();
         listContainer.revalidate();
         listContainer.repaint();
@@ -261,11 +273,13 @@ public class TrackerUI extends JFrame {
 
     private void removeBankRow(BankRow row) {
         bankRows.remove(row);
+        selectedRows.remove(row); // Remove from selection tracker safely
 
         if (row.isMainRow) {
             for (Component child : row.childrenPanel.getComponents()) {
                 if (child instanceof BankRow) {
                     bankRows.remove((BankRow) child);
+                    selectedRows.remove((BankRow) child);
                 }
             }
             listContainer.remove(row);
@@ -274,22 +288,45 @@ public class TrackerUI extends JFrame {
             if (parent != null) parent.remove(row);
         }
 
-        if (selectedRow == row) selectedRow = null;
         calculateTotal();
         listContainer.revalidate();
         listContainer.repaint();
     }
 
-    private void selectRow(BankRow row) {
-        if (selectedRow != null) selectedRow.setSelection(false);
-        selectedRow = row;
-        if (selectedRow != null) selectedRow.setSelection(true);
+    private void clearSelection() {
+        for (BankRow r : selectedRows) {
+            r.setSelection(false);
+        }
+        selectedRows.clear();
+    }
+
+    private void handleRowSelection(BankRow row, MouseEvent e) {
+        boolean multiSelect = e.isControlDown() || e.isMetaDown();
+
+        if (multiSelect) {
+            if (selectedRows.contains(row)) {
+                selectedRows.remove(row);
+                row.setSelection(false);
+            } else {
+                selectedRows.add(row);
+                row.setSelection(true);
+            }
+        } else {
+            clearSelection();
+            selectedRows.add(row);
+            row.setSelection(true);
+        }
     }
 
     private void calculateTotal() {
         List<String> amounts = new ArrayList<>();
         for (BankRow r : bankRows) {
-            amounts.add(r.amountField.getText());
+            String val = r.amountField.getText().trim();
+            if (val.isEmpty() || val.equals(".")) {
+                amounts.add("0.00");
+            } else {
+                amounts.add(val);
+            }
         }
         totalLabel.setText(String.format("Total Net: %,.2f", calcLogic.computeTotalAssets(amounts)));
     }
@@ -311,7 +348,7 @@ public class TrackerUI extends JFrame {
                 }
             }
         }
-        selectRow(null);
+        clearSelection();
         calculateTotal();
         listContainer.revalidate();
         listContainer.repaint();
@@ -392,8 +429,6 @@ public class TrackerUI extends JFrame {
                 ));
             } else {
                 col1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
-
-                // NEW: Use an empty string and rely entirely on our custom-drawn shape
                 toggleBtn = createFlatButton("", COLOR_BG, COLOR_TEXT_MAIN);
                 toggleBtn.setIcon(new ArrowIcon(false));
                 toggleBtn.setPreferredSize(new Dimension(45, 30));
@@ -439,6 +474,44 @@ public class TrackerUI extends JFrame {
             amountField.setFont(FONT_BOLD);
             amountField.setForeground(COLOR_TEXT_MAIN);
 
+            // --- NEW: Snap to decimal formatting if user clicks away ---
+            amountField.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    amountField.setText(formatAmountString(amountField.getText()));
+                }
+            });
+
+            // BULLETPROOF DOCUMENT FILTER
+            ((AbstractDocument) amountField.getDocument()).setDocumentFilter(new DocumentFilter() {
+                @Override
+                public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+                    if (string == null) return;
+                    replace(fb, offset, 0, string, attr);
+                }
+
+                @Override
+                public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                    if (text == null) return;
+
+                    String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                    StringBuilder sb = new StringBuilder(currentText);
+                    sb.replace(offset, offset + length, text);
+                    String resultingText = sb.toString();
+
+                    if (resultingText.matches("^\\d*\\.?\\d*$")) {
+                        super.replace(fb, offset, length, text, attrs);
+                    } else {
+                        Toolkit.getDefaultToolkit().beep();
+                    }
+                }
+
+                @Override
+                public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
+                    super.remove(fb, offset, length);
+                }
+            });
+
             amountField.getDocument().addDocumentListener(new DocumentListener() {
                 public void insertUpdate(DocumentEvent e) { calculateTotal(); }
                 public void removeUpdate(DocumentEvent e) { calculateTotal(); }
@@ -463,7 +536,7 @@ public class TrackerUI extends JFrame {
                 JButton addSubBtn = createFlatButton("+ Sub", new Color(230, 245, 230), new Color(40, 167, 69));
                 addSubBtn.setPreferredSize(new Dimension(70, 28));
                 addSubBtn.addActionListener(e -> {
-                    addSubBank("New Sub", "0.00", BankRow.this.imagePath);
+                    addSubBank("New Sub Bank", "0.00", BankRow.this.imagePath);
                     if (!isExpanded) toggleExpand();
                 });
                 col3.add(addSubBtn);
@@ -485,28 +558,43 @@ public class TrackerUI extends JFrame {
             // --- HOVER & SELECTION LOGIC ---
             MouseAdapter mouseAction = new MouseAdapter() {
                 @Override
-                public void mousePressed(MouseEvent e) { selectRow(BankRow.this); }
+                public void mousePressed(MouseEvent e) {
+                    handleRowSelection(BankRow.this, e);
+                }
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    if (selectedRow != BankRow.this) headerPanel.setBackground(COLOR_HOVER);
+                    if (!selectedRows.contains(BankRow.this)) headerPanel.setBackground(COLOR_HOVER);
                 }
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    if (selectedRow != BankRow.this) headerPanel.setBackground(COLOR_BG);
+                    if (!selectedRows.contains(BankRow.this)) headerPanel.setBackground(COLOR_BG);
                 }
             };
 
+            // Applying listeners to the panels
             headerPanel.addMouseListener(mouseAction);
             col1.addMouseListener(mouseAction);
             col2.addMouseListener(mouseAction);
             col3.addMouseListener(mouseAction);
 
-            FocusAdapter focusAction = new FocusAdapter() {
-                @Override
-                public void focusGained(FocusEvent e) { selectRow(BankRow.this); }
-            };
-            nameField.addFocusListener(focusAction);
-            amountField.addFocusListener(focusAction);
+            // Ensure text fields and images don't block the mouse clicks
+            nameField.addMouseListener(mouseAction);
+            amountField.addMouseListener(mouseAction);
+            imgPlaceholder.addMouseListener(mouseAction);
+        }
+
+        // Helper to format the amount nicely to 2 decimal places
+        private String formatAmountString(String text) {
+            String val = text.trim();
+            if (val.isEmpty() || val.equals(".")) {
+                return "0.00";
+            }
+            try {
+                double parsedValue = Double.parseDouble(val);
+                return String.format(java.util.Locale.US, "%.2f", parsedValue);
+            } catch (NumberFormatException ex) {
+                return "0.00";
+            }
         }
 
         public void addSubBank(String name, String amount, String path) {
@@ -522,7 +610,6 @@ public class TrackerUI extends JFrame {
             if (!isMainRow) return;
             isExpanded = !isExpanded;
             childrenPanel.setVisible(isExpanded);
-            // NEW: Swaps the drawn icon depending on state
             toggleBtn.setIcon(new ArrowIcon(isExpanded));
             revalidate();
         }
@@ -557,6 +644,9 @@ public class TrackerUI extends JFrame {
                 amountField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(150, 150, 150)));
                 nameField.requestFocusInWindow();
             } else {
+                // --- NEW: Snap to decimal formatting if user clicks 'Done' ---
+                amountField.setText(formatAmountString(amountField.getText()));
+
                 editBtn.setText("Edit");
                 editBtn.setBackground(new Color(233, 236, 239));
                 editBtn.setForeground(COLOR_TEXT_MAIN);
@@ -567,7 +657,6 @@ public class TrackerUI extends JFrame {
         }
     }
 
-    // --- NEW CLASS: FONT-INDEPENDENT DRAWN ARROW ---
     private class ArrowIcon implements Icon {
         private final boolean isExpanded;
 
@@ -578,21 +667,17 @@ public class TrackerUI extends JFrame {
         @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
             Graphics2D g2 = (Graphics2D) g.create();
-            // Turns on anti-aliasing so the arrow has smooth edges
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(COLOR_TEXT_MAIN);
 
-            // Shifting x and y slightly to center it inside the button
             int shiftX = x + 3;
             int shiftY = y + 2;
 
             if (isExpanded) {
-                // Draws a Down-Pointing Triangle ▼
                 int[] xPoints = {shiftX, shiftX + 10, shiftX + 5};
                 int[] yPoints = {shiftY + 3, shiftY + 3, shiftY + 9};
                 g2.fillPolygon(xPoints, yPoints, 3);
             } else {
-                // Draws a Right-Pointing Triangle ▶
                 int[] xPoints = {shiftX + 2, shiftX + 8, shiftX + 2};
                 int[] yPoints = {shiftY, shiftY + 5, shiftY + 10};
                 g2.fillPolygon(xPoints, yPoints, 3);
