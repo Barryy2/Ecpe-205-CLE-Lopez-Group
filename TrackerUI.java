@@ -115,7 +115,7 @@ public class TrackerUI extends JFrame {
         totalsPanel.setBackground(COLOR_BG);
         totalsPanel.setBorder(new EmptyBorder(15, 5, 0, 5));
 
-        totalLabel = new JLabel("Total Net: 0.00");
+        totalLabel = new JLabel("Total Net: ₱0.00");
         totalLabel.setFont(new Font(FONT_FAMILY, Font.BOLD, 18));
         totalLabel.setForeground(COLOR_TEXT_MAIN);
 
@@ -329,7 +329,7 @@ public class TrackerUI extends JFrame {
                 amounts.add(val);
             }
         }
-        totalLabel.setText(String.format("Total Net: %,.2f", calcLogic.computeTotalAssets(amounts)));
+        totalLabel.setText(String.format("Total Net: ₱%,.2f", calcLogic.computeTotalAssets(amounts)));
     }
 
     private void loadDataIntoUI() {
@@ -460,14 +460,18 @@ public class TrackerUI extends JFrame {
             col1.add(nameField);
 
             //  COLUMN 2: AMOUNT
-            JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, verticalGap));
+            JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, verticalGap));
             col2.setOpaque(false);
             Dimension d2 = new Dimension(COL2_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10);
             col2.setPreferredSize(d2); col2.setMaximumSize(d2);
             col2.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
 
+            JLabel pesoLabel = new JLabel("₱");
+            pesoLabel.setFont(FONT_BOLD);
+            pesoLabel.setForeground(COLOR_TEXT_MAIN);
+
             amountField = new JTextField(amount);
-            amountField.setPreferredSize(new Dimension(110, 30));
+            amountField.setPreferredSize(new Dimension(100, 30));
             amountField.setHorizontalAlignment(JTextField.RIGHT);
             amountField.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
             amountField.setOpaque(false);
@@ -475,7 +479,7 @@ public class TrackerUI extends JFrame {
             amountField.setFont(FONT_BOLD);
             amountField.setForeground(COLOR_TEXT_MAIN);
 
-            // --- NEW: Snap to decimal formatting if user clicks away ---
+
             amountField.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
@@ -483,7 +487,8 @@ public class TrackerUI extends JFrame {
                 }
             });
 
-            // BULLETPROOF DOCUMENT FILTER
+
+
             ((AbstractDocument) amountField.getDocument()).setDocumentFilter(new DocumentFilter() {
                 @Override
                 public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
@@ -519,6 +524,7 @@ public class TrackerUI extends JFrame {
                 public void changedUpdate(DocumentEvent e) { calculateTotal(); }
             });
 
+            col2.add(pesoLabel);
             col2.add(amountField);
 
             // --- COLUMN 3: ACTIONS ---
