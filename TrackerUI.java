@@ -245,7 +245,7 @@ public class TrackerUI extends JFrame {
 
     private boolean isNameDuplicate(String name, BankRow currentEditingRow) {
         String trimmedName = name.trim();
-        if (trimmedName.equalsIgnoreCase("New Bank")) return true;
+        if (trimmedName.equalsIgnoreCase("New Bank") || trimmedName.equalsIgnoreCase("New Sub Bank")) return true;
 
         for (Component c : listContainer.getComponents()) {
             if (c instanceof BankRow) {
@@ -503,6 +503,23 @@ public class TrackerUI extends JFrame {
             updateAmountColor();
         }
 
+        public boolean isSubNameDuplicate(String name, BankRow currentEditingRow) {
+            String trimmedName = name.trim();
+            if (trimmedName.equalsIgnoreCase("New Bank") || trimmedName.equalsIgnoreCase("New Sub Bank")) return true;
+
+            for (Component c : childrenPanel.getComponents()) {
+                if (c instanceof BankRow) {
+                    BankRow row = (BankRow) c;
+                    if (row != currentEditingRow) {
+                        if (row.nameField.getText().trim().equalsIgnoreCase(trimmedName)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         private void updateAmountColor() {
             try {
                 String text = amountField.getText().trim();
@@ -523,7 +540,14 @@ public class TrackerUI extends JFrame {
         }
 
         public void addSubBank(String name, String amount, String path) {
-            BankRow subRow = new BankRow(name, amount, path, false);
+            String uniqueName = name;
+            int count = 1;
+            while (isSubNameDuplicate(uniqueName, null)) {
+                uniqueName = "Sub Bank " + count;
+                count++;
+            }
+
+            BankRow subRow = new BankRow(uniqueName, amount, path, false);
             bankRows.add(subRow);
             childrenPanel.add(subRow);
             calculateTotal();
@@ -557,10 +581,20 @@ public class TrackerUI extends JFrame {
                 nameField.requestFocusInWindow();
             } else {
                 String newName = nameField.getText().trim();
-                if (isMainRow && isNameDuplicate(newName, this)) {
-                    JOptionPane.showMessageDialog(this, "The name '" + newName + "' is invalid or already exists. Please change to a new one.", "Invalid Name", JOptionPane.ERROR_MESSAGE);
-                    return;
+
+                if (isMainRow) {
+                    if (isNameDuplicate(newName, this)) {
+                        JOptionPane.showMessageDialog(this, "The name '" + newName + "' is invalid or already exists. Please change to a new one.", "Invalid Name", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } else {
+                    BankRow parentRow = (BankRow) this.getParent().getParent();
+                    if (parentRow.isSubNameDuplicate(newName, this)) {
+                        JOptionPane.showMessageDialog(this, "The name '" + newName + "' is invalid or already exists. Please change to a new one.", "Invalid Name", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 }
+
                 isEditing = false;
                 nameField.setEditable(false); amountField.setEditable(false);
                 amountField.setText(formatAmountString(amountField.getText()));
