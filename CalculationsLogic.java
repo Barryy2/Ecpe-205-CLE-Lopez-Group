@@ -82,4 +82,14 @@ public class CalculationsLogic {
         this.totalBal = total;
         return this.totalBal;
     }
+
+    // Checker if the inputted amount to the bank is less than 10
+    public boolean checkIfTen(double amount){
+
+        if (amount < 10){
+            return false;
+        }
+
+        return false;
+    }
 }
