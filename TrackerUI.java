@@ -24,7 +24,7 @@ public class TrackerUI extends JFrame {
     private final CalculationsLogic calcLogic;
 
     private final int ROW_HEIGHT = 50;
-    private final int COL2_WIDTH = 150;
+    private final int COL2_WIDTH = 100;
     private final int COL3_WIDTH = 230;
 
     private final String FONT_FAMILY = "Segoe UI";
@@ -245,7 +245,7 @@ public class TrackerUI extends JFrame {
 
     private boolean isNameDuplicate(String name, BankRow currentEditingRow) {
         String trimmedName = name.trim();
-        if (trimmedName.equalsIgnoreCase("New Bank")) return true;
+        if (trimmedName.equalsIgnoreCase("New Bank") || trimmedName.equalsIgnoreCase("New Sub Bank")) return true;
 
         for (Component c : listContainer.getComponents()) {
             if (c instanceof BankRow) {
@@ -457,9 +457,9 @@ public class TrackerUI extends JFrame {
             });
 
             amountField.getDocument().addDocumentListener(new DocumentListener() {
-                public void insertUpdate(DocumentEvent e) { calculateTotal(); }
-                public void removeUpdate(DocumentEvent e) { calculateTotal(); }
-                public void changedUpdate(DocumentEvent e) { calculateTotal(); }
+                public void insertUpdate(DocumentEvent e) { calculateTotal(); updateAmountColor(); }
+                public void removeUpdate(DocumentEvent e) { calculateTotal(); updateAmountColor(); }
+                public void changedUpdate(DocumentEvent e) { calculateTotal(); updateAmountColor(); }
             });
 
             col2.add(pesoLabel);
@@ -499,6 +499,39 @@ public class TrackerUI extends JFrame {
             headerPanel.addMouseListener(mouseAction);
             col1.addMouseListener(mouseAction); col2.addMouseListener(mouseAction); col3.addMouseListener(mouseAction);
             nameField.addMouseListener(mouseAction); amountField.addMouseListener(mouseAction); imgPlaceholder.addMouseListener(mouseAction);
+
+            updateAmountColor();
+        }
+
+        public boolean isSubNameDuplicate(String name, BankRow currentEditingRow) {
+            String trimmedName = name.trim();
+            if (trimmedName.equalsIgnoreCase("New Bank") || trimmedName.equalsIgnoreCase("New Sub Bank")) return true;
+
+            for (Component c : childrenPanel.getComponents()) {
+                if (c instanceof BankRow) {
+                    BankRow row = (BankRow) c;
+                    if (row != currentEditingRow) {
+                        if (row.nameField.getText().trim().equalsIgnoreCase(trimmedName)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void updateAmountColor() {
+            try {
+                String text = amountField.getText().trim();
+                double val = text.isEmpty() || text.equals(".") ? 0.0 : Double.parseDouble(text);
+                if (val < 10.0) {
+                    amountField.setForeground(Color.RED);
+                } else {
+                    amountField.setForeground(COLOR_TEXT_MAIN);
+                }
+            } catch (NumberFormatException e) {
+                amountField.setForeground(COLOR_TEXT_MAIN);
+            }
         }
 
         private String formatAmountString(String text) {
@@ -507,7 +540,14 @@ public class TrackerUI extends JFrame {
         }
 
         public void addSubBank(String name, String amount, String path) {
-            BankRow subRow = new BankRow(name, amount, path, false);
+            String uniqueName = name;
+            int count = 1;
+            while (isSubNameDuplicate(uniqueName, null)) {
+                uniqueName = "Sub Bank " + count;
+                count++;
+            }
+
+            BankRow subRow = new BankRow(uniqueName, amount, path, false);
             bankRows.add(subRow);
             childrenPanel.add(subRow);
             calculateTotal();
@@ -541,10 +581,20 @@ public class TrackerUI extends JFrame {
                 nameField.requestFocusInWindow();
             } else {
                 String newName = nameField.getText().trim();
-                if (isMainRow && isNameDuplicate(newName, this)) {
-                    JOptionPane.showMessageDialog(this, "The name '" + newName + "' is invalid or already exists. Please change to a new one.", "Invalid Name", JOptionPane.ERROR_MESSAGE);
-                    return;
+
+                if (isMainRow) {
+                    if (isNameDuplicate(newName, this)) {
+                        JOptionPane.showMessageDialog(this, "The name '" + newName + "' is invalid or already exists. Please change to a new one.", "Invalid Name", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } else {
+                    BankRow parentRow = (BankRow) this.getParent().getParent();
+                    if (parentRow.isSubNameDuplicate(newName, this)) {
+                        JOptionPane.showMessageDialog(this, "The name '" + newName + "' is invalid or already exists. Please change to a new one.", "Invalid Name", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 }
+
                 isEditing = false;
                 nameField.setEditable(false); amountField.setEditable(false);
                 amountField.setText(formatAmountString(amountField.getText()));

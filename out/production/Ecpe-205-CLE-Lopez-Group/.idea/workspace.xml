@@ -6,17 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="732395d6-000f-4ae7-9d39-aa392a384c22" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/TrackerUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/TrackerUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/CalculationsLogic.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/CalculationsLogic.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/DatabaseManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/DatabaseManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow$3.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bank_tracker.db" beforeDir="false" afterPath="$PROJECT_DIR$/bank_tracker.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI$BankRow.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/TrackerUI.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/bank_tracker.db" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/bank_tracker.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/verifyFileImage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/verifyFileImage.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,18 +40,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Lopez&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0"
   }
-}</component>
+}]]></component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="732395d6-000f-4ae7-9d39-aa392a384c22" name="Changes" comment="" />
