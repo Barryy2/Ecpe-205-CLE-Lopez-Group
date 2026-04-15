@@ -24,7 +24,7 @@ public class TrackerUI extends JFrame {
     private final CalculationsLogic calcLogic;
 
     private final int ROW_HEIGHT = 50;
-    private final int COL2_WIDTH = 150;
+    private final int COL2_WIDTH = 100;
     private final int COL3_WIDTH = 230;
 
     private final String FONT_FAMILY = "Segoe UI";
@@ -457,9 +457,9 @@ public class TrackerUI extends JFrame {
             });
 
             amountField.getDocument().addDocumentListener(new DocumentListener() {
-                public void insertUpdate(DocumentEvent e) { calculateTotal(); }
-                public void removeUpdate(DocumentEvent e) { calculateTotal(); }
-                public void changedUpdate(DocumentEvent e) { calculateTotal(); }
+                public void insertUpdate(DocumentEvent e) { calculateTotal(); updateAmountColor(); }
+                public void removeUpdate(DocumentEvent e) { calculateTotal(); updateAmountColor(); }
+                public void changedUpdate(DocumentEvent e) { calculateTotal(); updateAmountColor(); }
             });
 
             col2.add(pesoLabel);
@@ -499,6 +499,22 @@ public class TrackerUI extends JFrame {
             headerPanel.addMouseListener(mouseAction);
             col1.addMouseListener(mouseAction); col2.addMouseListener(mouseAction); col3.addMouseListener(mouseAction);
             nameField.addMouseListener(mouseAction); amountField.addMouseListener(mouseAction); imgPlaceholder.addMouseListener(mouseAction);
+
+            updateAmountColor();
+        }
+
+        private void updateAmountColor() {
+            try {
+                String text = amountField.getText().trim();
+                double val = text.isEmpty() || text.equals(".") ? 0.0 : Double.parseDouble(text);
+                if (val < 10.0) {
+                    amountField.setForeground(Color.RED);
+                } else {
+                    amountField.setForeground(COLOR_TEXT_MAIN);
+                }
+            } catch (NumberFormatException e) {
+                amountField.setForeground(COLOR_TEXT_MAIN);
+            }
         }
 
         private String formatAmountString(String text) {
