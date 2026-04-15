@@ -18,26 +18,21 @@ public class TrackerUI extends JFrame {
     private final List<BankRow> bankRows = new ArrayList<>();
     private JLabel totalLabel;
 
-    // Tracks a list of selections
     private final List<BankRow> selectedRows = new ArrayList<>();
 
-    // Database and Logic instances
     private final DatabaseManager dbManager;
     private final CalculationsLogic calcLogic;
 
-    // Standardized Sizes
     private final int ROW_HEIGHT = 50;
-    private final int COL2_WIDTH = 150; // Amount
-    private final int COL3_WIDTH = 230; // Actions
+    private final int COL2_WIDTH = 150;
+    private final int COL3_WIDTH = 230;
 
-    // Fonts & Colors Palette
     private final String FONT_FAMILY = "Segoe UI";
 
     private final Color COLOR_BG = Color.WHITE;
     private final Color COLOR_HOVER = new Color(245, 248, 250);
     private final Color COLOR_SELECTED = new Color(230, 238, 245);
     private final Color COLOR_TEXT_MAIN = new Color(33, 37, 41);
-    private final Color COLOR_TEXT_MUTED = new Color(108, 117, 125);
     private final Color COLOR_GRIDLINE = new Color(210, 210, 210);
 
     private final Font FONT_MAIN = new Font(FONT_FAMILY, Font.PLAIN, 15);
@@ -56,16 +51,14 @@ public class TrackerUI extends JFrame {
         setLayout(new BorderLayout());
         getContentPane().setBackground(COLOR_BG);
 
-        // DASHBOARD PANEL
         JPanel dashboardPanel = new JPanel(new BorderLayout());
         dashboardPanel.setBackground(Color.GREEN);
         dashboardPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // CENTER: Scrollable Table Data
         listContainer = new JPanel();
         listContainer.setLayout(new BoxLayout(listContainer, BoxLayout.Y_AXIS));
         listContainer.setBackground(Color.BLUE);
-        listContainer.setOpaque(true);
+        listContainer.setOpaque(false);
 
         JPanel backgroundWrapper = new JPanel(new BorderLayout());
         backgroundWrapper.setBackground(Color.BLUE);
@@ -75,7 +68,6 @@ public class TrackerUI extends JFrame {
         scrollPane.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
-        //  BUILD THE TABLE HEADER
         JPanel headerRow = new JPanel();
         headerRow.setLayout(new BoxLayout(headerRow, BoxLayout.X_AXIS));
         headerRow.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -86,7 +78,6 @@ public class TrackerUI extends JFrame {
 
         scrollPane.setColumnHeaderView(headerRow);
 
-        //  SOUTH Controls and Totals
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         bottomPanel.setBackground(COLOR_BG);
@@ -151,8 +142,6 @@ public class TrackerUI extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    //  UI HELPERS
-
     private JPanel createHeaderCell(String title, int width, boolean stretch) {
         JPanel panel = new JPanel(new BorderLayout());
         if (stretch) {
@@ -209,7 +198,6 @@ public class TrackerUI extends JFrame {
             preview.setText("No Image");
         }
 
-        // Quick Select Buttons
         String gcashPath = "Default Bank Images/Gcash.png";
         JButton gcashBtn = new JButton(scaleIcon(gcashPath, 100, 100));
         gcashBtn.addActionListener(e -> { row.updateRowImage(gcashPath); dialog.dispose(); });
@@ -232,7 +220,6 @@ public class TrackerUI extends JFrame {
             fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
             if (fc.showOpenDialog(dialog) == JFileChooser.APPROVE_OPTION) {
                 String filePath = fc.getSelectedFile().getAbsolutePath();
-
                 verifyFileImage.VerificationResult result = verifyFileImage.verifyImageFile(filePath);
                 if (result.isValid) {
                     row.updateRowImage(filePath);
@@ -256,10 +243,32 @@ public class TrackerUI extends JFrame {
         dialog.setVisible(true);
     }
 
-    //  DATA & LOGIC HANDLING
+    private boolean isNameDuplicate(String name, BankRow currentEditingRow) {
+        String trimmedName = name.trim();
+        if (trimmedName.equalsIgnoreCase("New Bank")) return true;
+
+        for (Component c : listContainer.getComponents()) {
+            if (c instanceof BankRow) {
+                BankRow row = (BankRow) c;
+                if (row != currentEditingRow) {
+                    if (row.nameField.getText().trim().equalsIgnoreCase(trimmedName)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     private void addBankRow(String name, String amount, String path, boolean startInEditMode) {
-        BankRow row = new BankRow(name, amount, path, true);
+        String uniqueName = name;
+        int count = 1;
+        while (isNameDuplicate(uniqueName, null)) {
+            uniqueName = "Bank " + count;
+            count++;
+        }
+
+        BankRow row = new BankRow(uniqueName, amount, path, true);
         bankRows.add(row);
         listContainer.add(row);
 
@@ -274,8 +283,7 @@ public class TrackerUI extends JFrame {
 
     private void removeBankRow(BankRow row) {
         bankRows.remove(row);
-        selectedRows.remove(row); // Remove from selection tracker safely
-
+        selectedRows.remove(row);
         if (row.isMainRow) {
             for (Component child : row.childrenPanel.getComponents()) {
                 if (child instanceof BankRow) {
@@ -288,22 +296,18 @@ public class TrackerUI extends JFrame {
             Container parent = row.getParent();
             if (parent != null) parent.remove(row);
         }
-
         calculateTotal();
         listContainer.revalidate();
         listContainer.repaint();
     }
 
     private void clearSelection() {
-        for (BankRow r : selectedRows) {
-            r.setSelection(false);
-        }
+        for (BankRow r : selectedRows) r.setSelection(false);
         selectedRows.clear();
     }
 
     private void handleRowSelection(BankRow row, MouseEvent e) {
         boolean multiSelect = e.isControlDown() || e.isMetaDown();
-
         if (multiSelect) {
             if (selectedRows.contains(row)) {
                 selectedRows.remove(row);
@@ -323,11 +327,7 @@ public class TrackerUI extends JFrame {
         List<String> amounts = new ArrayList<>();
         for (BankRow r : bankRows) {
             String val = r.amountField.getText().trim();
-            if (val.isEmpty() || val.equals(".")) {
-                amounts.add("0.00");
-            } else {
-                amounts.add(val);
-            }
+            amounts.add((val.isEmpty() || val.equals(".")) ? "0.00" : val);
         }
         totalLabel.setText(String.format("Total Net: ₱%,.2f", calcLogic.computeTotalAssets(amounts)));
     }
@@ -339,8 +339,7 @@ public class TrackerUI extends JFrame {
         } else {
             BankRow currentMain = null;
             for (String[] row : data) {
-                String parentId = row[1];
-                if (parentId.equals("0")) {
+                if (row[1].equals("0")) {
                     currentMain = new BankRow(row[2], row[3], row[4], true);
                     bankRows.add(currentMain);
                     listContainer.add(currentMain);
@@ -359,53 +358,33 @@ public class TrackerUI extends JFrame {
         this.requestFocusInWindow();
         List<String[]> toSave = new ArrayList<>();
         int idCounter = 1;
-
         for (Component c : listContainer.getComponents()) {
             if (c instanceof BankRow) {
                 BankRow mainRow = (BankRow) c;
                 int mainId = idCounter++;
-                toSave.add(new String[]{
-                        String.valueOf(mainId), "0", mainRow.nameField.getText().trim(),
-                        mainRow.amountField.getText().trim(), mainRow.imagePath
-                });
-
+                toSave.add(new String[]{String.valueOf(mainId), "0", mainRow.nameField.getText().trim(), mainRow.amountField.getText().trim(), mainRow.imagePath});
                 for (Component child : mainRow.childrenPanel.getComponents()) {
                     if (child instanceof BankRow) {
                         BankRow subRow = (BankRow) child;
-                        int subId = idCounter++;
-                        toSave.add(new String[]{
-                                String.valueOf(subId), String.valueOf(mainId), subRow.nameField.getText().trim(),
-                                subRow.amountField.getText().trim(), subRow.imagePath
-                        });
+                        toSave.add(new String[]{String.valueOf(idCounter++), String.valueOf(mainId), subRow.nameField.getText().trim(), subRow.amountField.getText().trim(), subRow.imagePath});
                     }
                 }
             }
         }
-        try {
-            dbManager.saveAccounts(toSave);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error saving data: " + e.getMessage());
-        }
+        try { dbManager.saveAccounts(toSave); } catch (Exception e) { JOptionPane.showMessageDialog(this, "Error saving: " + e.getMessage()); }
     }
-
-    //  CUSTOM HIERARCHICAL ROW COMPONENT
 
     private class BankRow extends JPanel {
         JTextField nameField, amountField;
         JLabel imgPlaceholder;
         JButton editBtn, toggleBtn;
         String imagePath;
-        boolean isEditing = false;
-        boolean isMainRow;
-        boolean isExpanded = false;
-
-        JPanel headerPanel;
-        JPanel childrenPanel;
+        boolean isEditing = false, isMainRow, isExpanded = false;
+        JPanel headerPanel, childrenPanel;
 
         public BankRow(String name, String amount, String path, boolean isMainRow) {
             this.imagePath = path;
             this.isMainRow = isMainRow;
-
             setLayout(new BorderLayout());
             setBackground(COLOR_BG);
             setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -415,19 +394,13 @@ public class TrackerUI extends JFrame {
             headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.X_AXIS));
             headerPanel.setBackground(COLOR_BG);
             headerPanel.setPreferredSize(new Dimension(0, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10));
-            headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10));
 
             int verticalGap = isMainRow ? 8 : 4;
-
-            // --- COLUMN 1: TOGGLE, IMAGE, NAME ---
             JPanel col1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, verticalGap));
             col1.setOpaque(false);
 
             if (!isMainRow) {
-                col1.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE),
-                        BorderFactory.createEmptyBorder(0, 55, 0, 0) // Indent sub-banks
-                ));
+                col1.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE), BorderFactory.createEmptyBorder(0, 55, 0, 0)));
             } else {
                 col1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
                 toggleBtn = createFlatButton("", COLOR_BG, COLOR_TEXT_MAIN);
@@ -441,11 +414,7 @@ public class TrackerUI extends JFrame {
             imgPlaceholder.setPreferredSize(new Dimension(32, 32));
             imgPlaceholder.setOpaque(true);
             imgPlaceholder.setBackground(new Color(240, 240, 240));
-            imgPlaceholder.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    if (isEditing) showImagePopup(BankRow.this);
-                }
-            });
+            imgPlaceholder.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { if (isEditing) showImagePopup(BankRow.this); }});
             updateRowImage(path);
 
             nameField = new JTextField(name);
@@ -459,11 +428,9 @@ public class TrackerUI extends JFrame {
             col1.add(imgPlaceholder);
             col1.add(nameField);
 
-            //  COLUMN 2: AMOUNT
-            JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, verticalGap));
+            JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, verticalGap));
             col2.setOpaque(false);
-            Dimension d2 = new Dimension(COL2_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10);
-            col2.setPreferredSize(d2); col2.setMaximumSize(d2);
+            col2.setPreferredSize(new Dimension(COL2_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10));
             col2.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
 
             JLabel pesoLabel = new JLabel("₱");
@@ -478,43 +445,14 @@ public class TrackerUI extends JFrame {
             amountField.setEditable(false);
             amountField.setFont(FONT_BOLD);
             amountField.setForeground(COLOR_TEXT_MAIN);
-
-
-            amountField.addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    amountField.setText(formatAmountString(amountField.getText()));
-                }
-            });
-
-
+            amountField.addFocusListener(new FocusAdapter() { public void focusLost(FocusEvent e) { amountField.setText(formatAmountString(amountField.getText())); }});
 
             ((AbstractDocument) amountField.getDocument()).setDocumentFilter(new DocumentFilter() {
                 @Override
-                public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
-                    if (string == null) return;
-                    replace(fb, offset, 0, string, attr);
-                }
-
-                @Override
                 public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-                    if (text == null) return;
-
-                    String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
-                    StringBuilder sb = new StringBuilder(currentText);
-                    sb.replace(offset, offset + length, text);
-                    String resultingText = sb.toString();
-
-                    if (resultingText.matches("^\\d*\\.?\\d*$")) {
-                        super.replace(fb, offset, length, text, attrs);
-                    } else {
-                        Toolkit.getDefaultToolkit().beep();
-                    }
-                }
-
-                @Override
-                public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
-                    super.remove(fb, offset, length);
+                    String resultingText = new StringBuilder(fb.getDocument().getText(0, fb.getDocument().getLength())).replace(offset, offset + length, text).toString();
+                    if (resultingText.matches("^\\d*\\.?\\d*$")) super.replace(fb, offset, length, text, attrs);
+                    else Toolkit.getDefaultToolkit().beep();
                 }
             });
 
@@ -527,11 +465,9 @@ public class TrackerUI extends JFrame {
             col2.add(pesoLabel);
             col2.add(amountField);
 
-            // --- COLUMN 3: ACTIONS ---
             JPanel col3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, verticalGap));
             col3.setOpaque(false);
-            Dimension d3 = new Dimension(COL3_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10);
-            col3.setPreferredSize(d3); col3.setMaximumSize(d3);
+            col3.setPreferredSize(new Dimension(COL3_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10));
             col3.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_GRIDLINE));
 
             editBtn = createFlatButton("Edit", new Color(233, 236, 239), COLOR_TEXT_MAIN);
@@ -542,66 +478,32 @@ public class TrackerUI extends JFrame {
             if (isMainRow) {
                 JButton addSubBtn = createFlatButton("+ Sub", new Color(230, 245, 230), new Color(40, 167, 69));
                 addSubBtn.setPreferredSize(new Dimension(70, 28));
-                addSubBtn.addActionListener(e -> {
-                    addSubBank("New Sub Bank", "0.00", BankRow.this.imagePath);
-                    if (!isExpanded) toggleExpand();
-                });
+                addSubBtn.addActionListener(e -> { addSubBank("New Sub Bank", "0.00", BankRow.this.imagePath); if (!isExpanded) toggleExpand(); });
                 col3.add(addSubBtn);
             }
 
-            headerPanel.add(col1);
-            headerPanel.add(col2);
-            headerPanel.add(col3);
-
+            headerPanel.add(col1); headerPanel.add(col2); headerPanel.add(col3);
             add(headerPanel, BorderLayout.NORTH);
 
-            // --- CHILDREN CONTAINER ---
             childrenPanel = new JPanel();
             childrenPanel.setLayout(new BoxLayout(childrenPanel, BoxLayout.Y_AXIS));
             childrenPanel.setOpaque(false);
             childrenPanel.setVisible(false);
             add(childrenPanel, BorderLayout.CENTER);
 
-            // --- HOVER & SELECTION LOGIC ---
             MouseAdapter mouseAction = new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    handleRowSelection(BankRow.this, e);
-                }
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    if (!selectedRows.contains(BankRow.this)) headerPanel.setBackground(COLOR_HOVER);
-                }
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    if (!selectedRows.contains(BankRow.this)) headerPanel.setBackground(COLOR_BG);
-                }
+                public void mousePressed(MouseEvent e) { handleRowSelection(BankRow.this, e); }
+                public void mouseEntered(MouseEvent e) { if (!selectedRows.contains(BankRow.this)) headerPanel.setBackground(COLOR_HOVER); }
+                public void mouseExited(MouseEvent e) { if (!selectedRows.contains(BankRow.this)) headerPanel.setBackground(COLOR_BG); }
             };
-
-            // Applying listeners to the panels
             headerPanel.addMouseListener(mouseAction);
-            col1.addMouseListener(mouseAction);
-            col2.addMouseListener(mouseAction);
-            col3.addMouseListener(mouseAction);
-
-            // Ensure text fields and images don't block the mouse clicks
-            nameField.addMouseListener(mouseAction);
-            amountField.addMouseListener(mouseAction);
-            imgPlaceholder.addMouseListener(mouseAction);
+            col1.addMouseListener(mouseAction); col2.addMouseListener(mouseAction); col3.addMouseListener(mouseAction);
+            nameField.addMouseListener(mouseAction); amountField.addMouseListener(mouseAction); imgPlaceholder.addMouseListener(mouseAction);
         }
 
-        // Helper to format the amount nicely to 2 decimal places
         private String formatAmountString(String text) {
-            String val = text.trim();
-            if (val.isEmpty() || val.equals(".")) {
-                return "0.00";
-            }
-            try {
-                double parsedValue = Double.parseDouble(val);
-                return String.format(java.util.Locale.US, "%.2f", parsedValue);
-            } catch (NumberFormatException ex) {
-                return "0.00";
-            }
+            try { return String.format(java.util.Locale.US, "%.2f", Double.parseDouble(text.trim().isEmpty() ? "0" : text.trim())); }
+            catch (Exception ex) { return "0.00"; }
         }
 
         public void addSubBank(String name, String amount, String path) {
@@ -609,8 +511,7 @@ public class TrackerUI extends JFrame {
             bankRows.add(subRow);
             childrenPanel.add(subRow);
             calculateTotal();
-            revalidate();
-            repaint();
+            revalidate(); repaint();
         }
 
         public void toggleExpand() {
@@ -624,40 +525,30 @@ public class TrackerUI extends JFrame {
         public void updateRowImage(String path) {
             this.imagePath = path;
             ImageIcon icon = scaleIcon(path, 24, 24);
-            if (icon != null) {
-                imgPlaceholder.setIcon(icon);
-                imgPlaceholder.setText("");
-            } else {
-                imgPlaceholder.setIcon(null);
-                imgPlaceholder.setText("img");
-            }
+            imgPlaceholder.setIcon(icon);
+            imgPlaceholder.setText(icon == null ? "img" : "");
         }
 
-        public void setSelection(boolean selected) {
-            headerPanel.setBackground(selected ? COLOR_SELECTED : COLOR_BG);
-        }
+        public void setSelection(boolean selected) { headerPanel.setBackground(selected ? COLOR_SELECTED : COLOR_BG); }
 
         private void toggleEditMode() {
-            isEditing = !isEditing;
-            nameField.setEditable(isEditing);
-            amountField.setEditable(isEditing);
-
-            if (isEditing) {
-                editBtn.setText("Done");
-                editBtn.setBackground(new Color(212, 237, 218));
-                editBtn.setForeground(new Color(21, 87, 36));
-
+            if (!isEditing) {
+                isEditing = true;
+                nameField.setEditable(true); amountField.setEditable(true);
+                editBtn.setText("Done"); editBtn.setBackground(new Color(212, 237, 218)); editBtn.setForeground(new Color(21, 87, 36));
                 nameField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(150, 150, 150)));
                 amountField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(150, 150, 150)));
                 nameField.requestFocusInWindow();
             } else {
-                // --- NEW: Snap to decimal formatting if user clicks 'Done' ---
+                String newName = nameField.getText().trim();
+                if (isMainRow && isNameDuplicate(newName, this)) {
+                    JOptionPane.showMessageDialog(this, "The name '" + newName + "' is invalid or already exists. Please change to a new one.", "Invalid Name", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                isEditing = false;
+                nameField.setEditable(false); amountField.setEditable(false);
                 amountField.setText(formatAmountString(amountField.getText()));
-
-                editBtn.setText("Edit");
-                editBtn.setBackground(new Color(233, 236, 239));
-                editBtn.setForeground(COLOR_TEXT_MAIN);
-
+                editBtn.setText("Edit"); editBtn.setBackground(new Color(233, 236, 239)); editBtn.setForeground(COLOR_TEXT_MAIN);
                 nameField.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
                 amountField.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
             }
@@ -666,32 +557,17 @@ public class TrackerUI extends JFrame {
 
     private class ArrowIcon implements Icon {
         private final boolean isExpanded;
-
-        public ArrowIcon(boolean isExpanded) {
-            this.isExpanded = isExpanded;
-        }
-
+        public ArrowIcon(boolean isExpanded) { this.isExpanded = isExpanded; }
         @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(COLOR_TEXT_MAIN);
-
-            int shiftX = x + 3;
-            int shiftY = y + 2;
-
-            if (isExpanded) {
-                int[] xPoints = {shiftX, shiftX + 10, shiftX + 5};
-                int[] yPoints = {shiftY + 3, shiftY + 3, shiftY + 9};
-                g2.fillPolygon(xPoints, yPoints, 3);
-            } else {
-                int[] xPoints = {shiftX + 2, shiftX + 8, shiftX + 2};
-                int[] yPoints = {shiftY, shiftY + 5, shiftY + 10};
-                g2.fillPolygon(xPoints, yPoints, 3);
-            }
+            int sx = x + 3, sy = y + 2;
+            if (isExpanded) g2.fillPolygon(new int[]{sx, sx + 10, sx + 5}, new int[]{sy + 3, sy + 3, sy + 9}, 3);
+            else g2.fillPolygon(new int[]{sx + 2, sx + 8, sx + 2}, new int[]{sy, sy + 5, sy + 10}, 3);
             g2.dispose();
         }
-
         @Override public int getIconWidth() { return 14; }
         @Override public int getIconHeight() { return 14; }
     }
