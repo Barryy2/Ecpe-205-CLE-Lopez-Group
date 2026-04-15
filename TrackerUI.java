@@ -24,15 +24,18 @@ public class TrackerUI extends JFrame {
     private final int COL2_WIDTH = 150; // Amount
     private final int COL3_WIDTH = 230; // Actions
 
-    // Color Palette
+    // Fonts & Colors Palette
+    private final String FONT_FAMILY = "Segoe UI";
+
     private final Color COLOR_BG = Color.WHITE;
     private final Color COLOR_HOVER = new Color(245, 248, 250);
     private final Color COLOR_SELECTED = new Color(230, 238, 245);
     private final Color COLOR_TEXT_MAIN = new Color(33, 37, 41);
     private final Color COLOR_TEXT_MUTED = new Color(108, 117, 125);
     private final Color COLOR_GRIDLINE = new Color(210, 210, 210);
-    private final Font FONT_MAIN = new Font("SansSerif", Font.PLAIN, 15);
-    private final Font FONT_BOLD = new Font("SansSerif", Font.BOLD, 15);
+
+    private final Font FONT_MAIN = new Font(FONT_FAMILY, Font.PLAIN, 15);
+    private final Font FONT_BOLD = new Font(FONT_FAMILY, Font.BOLD, 15);
 
     public TrackerUI() {
         try {
@@ -49,7 +52,7 @@ public class TrackerUI extends JFrame {
 
         // DASHBOARD PANEL
         JPanel dashboardPanel = new JPanel(new BorderLayout());
-        dashboardPanel.setBackground(Color.GREEN); // RESTORED GREEN BORDER
+        dashboardPanel.setBackground(COLOR_BG);
         dashboardPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // CENTER: Scrollable Table Data
@@ -59,7 +62,7 @@ public class TrackerUI extends JFrame {
 
         //
         JPanel backgroundWrapper = new JPanel(new BorderLayout());
-        backgroundWrapper.setBackground(Color.BLUE);
+        backgroundWrapper.setBackground(COLOR_BG);
         backgroundWrapper.add(listContainer, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(backgroundWrapper);
@@ -104,7 +107,7 @@ public class TrackerUI extends JFrame {
         totalsPanel.setBorder(new EmptyBorder(15, 5, 0, 5));
 
         totalLabel = new JLabel("Total Net: 0.00");
-        totalLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        totalLabel.setFont(new Font(FONT_FAMILY, Font.BOLD, 18));
         totalLabel.setForeground(COLOR_TEXT_MAIN);
 
         JButton saveButton = createFlatButton("Save All Data", new Color(40, 167, 69), Color.WHITE);
@@ -120,7 +123,7 @@ public class TrackerUI extends JFrame {
         dashboardPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        tabbedPane.setFont(new Font(FONT_FAMILY, Font.PLAIN, 13));
         tabbedPane.setFocusable(false);
         tabbedPane.addTab("Dashboard", dashboardPanel);
 
@@ -155,7 +158,7 @@ public class TrackerUI extends JFrame {
         panel.setBackground(new Color(238, 242, 246));
         panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED, Color.WHITE, new Color(180, 180, 180)));
         JLabel label = new JLabel(title, SwingConstants.CENTER);
-        label.setFont(new Font("SansSerif", Font.BOLD, 13));
+        label.setFont(new Font(FONT_FAMILY, Font.BOLD, 13));
         label.setForeground(new Color(50, 50, 50));
         panel.add(label, BorderLayout.CENTER);
         return panel;
@@ -163,13 +166,13 @@ public class TrackerUI extends JFrame {
 
     private JButton createFlatButton(String text, Color bg, Color fg) {
         JButton btn = new JButton(text);
-        btn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btn.setFont(new Font(FONT_FAMILY, Font.BOLD, 12));
         btn.setForeground(fg);
         btn.setBackground(bg);
         btn.setBorder(new EmptyBorder(6, 12, 6, 12));
         btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setContentAreaFilled(false);
         btn.setOpaque(true);
         return btn;
     }
@@ -389,7 +392,10 @@ public class TrackerUI extends JFrame {
                 ));
             } else {
                 col1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
-                toggleBtn = createFlatButton("▶", COLOR_BG, COLOR_TEXT_MAIN);
+
+                // NEW: Use an empty string and rely entirely on our custom-drawn shape
+                toggleBtn = createFlatButton("", COLOR_BG, COLOR_TEXT_MAIN);
+                toggleBtn.setIcon(new ArrowIcon(false));
                 toggleBtn.setPreferredSize(new Dimension(45, 30));
                 toggleBtn.addActionListener(e -> toggleExpand());
                 col1.add(toggleBtn);
@@ -516,7 +522,8 @@ public class TrackerUI extends JFrame {
             if (!isMainRow) return;
             isExpanded = !isExpanded;
             childrenPanel.setVisible(isExpanded);
-            toggleBtn.setText(isExpanded ? "▼" : "▶");
+            // NEW: Swaps the drawn icon depending on state
+            toggleBtn.setIcon(new ArrowIcon(isExpanded));
             revalidate();
         }
 
@@ -558,5 +565,42 @@ public class TrackerUI extends JFrame {
                 amountField.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
             }
         }
+    }
+
+    // --- NEW CLASS: FONT-INDEPENDENT DRAWN ARROW ---
+    private class ArrowIcon implements Icon {
+        private final boolean isExpanded;
+
+        public ArrowIcon(boolean isExpanded) {
+            this.isExpanded = isExpanded;
+        }
+
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            // Turns on anti-aliasing so the arrow has smooth edges
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(COLOR_TEXT_MAIN);
+
+            // Shifting x and y slightly to center it inside the button
+            int shiftX = x + 3;
+            int shiftY = y + 2;
+
+            if (isExpanded) {
+                // Draws a Down-Pointing Triangle ▼
+                int[] xPoints = {shiftX, shiftX + 10, shiftX + 5};
+                int[] yPoints = {shiftY + 3, shiftY + 3, shiftY + 9};
+                g2.fillPolygon(xPoints, yPoints, 3);
+            } else {
+                // Draws a Right-Pointing Triangle ▶
+                int[] xPoints = {shiftX + 2, shiftX + 8, shiftX + 2};
+                int[] yPoints = {shiftY, shiftY + 5, shiftY + 10};
+                g2.fillPolygon(xPoints, yPoints, 3);
+            }
+            g2.dispose();
+        }
+
+        @Override public int getIconWidth() { return 14; }
+        @Override public int getIconHeight() { return 14; }
     }
 }
