@@ -18,15 +18,19 @@ public class TrackerUI extends JFrame {
     private final List<BankRow> bankRows = new ArrayList<>();
     private JLabel totalLabel;
 
+    // Tracks a list of selections
     private final List<BankRow> selectedRows = new ArrayList<>();
 
+    // Database and Logic instances
     private final DatabaseManager dbManager;
     private final CalculationsLogic calcLogic;
 
+    // Standardized Sizes
     private final int ROW_HEIGHT = 50;
-    private final int COL2_WIDTH = 150;
-    private final int COL3_WIDTH = 230;
+    private final int COL2_WIDTH = 150; // Amount
+    private final int COL3_WIDTH = 230; // Actions
 
+    // Fonts & Colors Palette
     private final String FONT_FAMILY = "Segoe UI";
 
     private final Color COLOR_BG = Color.WHITE;
@@ -52,22 +56,26 @@ public class TrackerUI extends JFrame {
         setLayout(new BorderLayout());
         getContentPane().setBackground(COLOR_BG);
 
+        // DASHBOARD PANEL
         JPanel dashboardPanel = new JPanel(new BorderLayout());
-        dashboardPanel.setBackground(COLOR_BG);
+        dashboardPanel.setBackground(Color.GREEN);
         dashboardPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
+        // CENTER: Scrollable Table Data
         listContainer = new JPanel();
         listContainer.setLayout(new BoxLayout(listContainer, BoxLayout.Y_AXIS));
-        listContainer.setOpaque(false);
+        listContainer.setBackground(Color.BLUE);
+        listContainer.setOpaque(true);
 
         JPanel backgroundWrapper = new JPanel(new BorderLayout());
-        backgroundWrapper.setBackground(COLOR_BG);
+        backgroundWrapper.setBackground(Color.BLUE);
         backgroundWrapper.add(listContainer, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(backgroundWrapper);
         scrollPane.setBorder(BorderFactory.createLineBorder(COLOR_GRIDLINE));
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
+        //  BUILD THE TABLE HEADER
         JPanel headerRow = new JPanel();
         headerRow.setLayout(new BoxLayout(headerRow, BoxLayout.X_AXIS));
         headerRow.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -78,6 +86,7 @@ public class TrackerUI extends JFrame {
 
         scrollPane.setColumnHeaderView(headerRow);
 
+        //  SOUTH Controls and Totals
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         bottomPanel.setBackground(COLOR_BG);
@@ -142,6 +151,8 @@ public class TrackerUI extends JFrame {
         setLocationRelativeTo(null);
     }
 
+    //  UI HELPERS
+
     private JPanel createHeaderCell(String title, int width, boolean stretch) {
         JPanel panel = new JPanel(new BorderLayout());
         if (stretch) {
@@ -198,6 +209,7 @@ public class TrackerUI extends JFrame {
             preview.setText("No Image");
         }
 
+        // Quick Select Buttons
         String gcashPath = "Default Bank Images/Gcash.png";
         JButton gcashBtn = new JButton(scaleIcon(gcashPath, 100, 100));
         gcashBtn.addActionListener(e -> { row.updateRowImage(gcashPath); dialog.dispose(); });
@@ -244,6 +256,8 @@ public class TrackerUI extends JFrame {
         dialog.setVisible(true);
     }
 
+    //  DATA & LOGIC HANDLING
+
     private void addBankRow(String name, String amount, String path, boolean startInEditMode) {
         BankRow row = new BankRow(name, amount, path, true);
         bankRows.add(row);
@@ -260,7 +274,7 @@ public class TrackerUI extends JFrame {
 
     private void removeBankRow(BankRow row) {
         bankRows.remove(row);
-        selectedRows.remove(row);
+        selectedRows.remove(row); // Remove from selection tracker safely
 
         if (row.isMainRow) {
             for (Component child : row.childrenPanel.getComponents()) {
@@ -374,6 +388,8 @@ public class TrackerUI extends JFrame {
         }
     }
 
+    //  CUSTOM HIERARCHICAL ROW COMPONENT
+
     private class BankRow extends JPanel {
         JTextField nameField, amountField;
         JLabel imgPlaceholder;
@@ -403,13 +419,14 @@ public class TrackerUI extends JFrame {
 
             int verticalGap = isMainRow ? 8 : 4;
 
+            // --- COLUMN 1: TOGGLE, IMAGE, NAME ---
             JPanel col1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, verticalGap));
             col1.setOpaque(false);
 
             if (!isMainRow) {
                 col1.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE),
-                        BorderFactory.createEmptyBorder(0, 55, 0, 0)
+                        BorderFactory.createEmptyBorder(0, 55, 0, 0) // Indent sub-banks
                 ));
             } else {
                 col1.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, COLOR_GRIDLINE));
@@ -442,7 +459,8 @@ public class TrackerUI extends JFrame {
             col1.add(imgPlaceholder);
             col1.add(nameField);
 
-            JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, verticalGap));
+            //  COLUMN 2: AMOUNT
+            JPanel col2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, verticalGap));
             col2.setOpaque(false);
             Dimension d2 = new Dimension(COL2_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10);
             col2.setPreferredSize(d2); col2.setMaximumSize(d2);
@@ -461,12 +479,15 @@ public class TrackerUI extends JFrame {
             amountField.setFont(FONT_BOLD);
             amountField.setForeground(COLOR_TEXT_MAIN);
 
+
             amountField.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
                     amountField.setText(formatAmountString(amountField.getText()));
                 }
             });
+
+
 
             ((AbstractDocument) amountField.getDocument()).setDocumentFilter(new DocumentFilter() {
                 @Override
@@ -506,6 +527,7 @@ public class TrackerUI extends JFrame {
             col2.add(pesoLabel);
             col2.add(amountField);
 
+            // --- COLUMN 3: ACTIONS ---
             JPanel col3 = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, verticalGap));
             col3.setOpaque(false);
             Dimension d3 = new Dimension(COL3_WIDTH, isMainRow ? ROW_HEIGHT : ROW_HEIGHT - 10);
@@ -533,12 +555,14 @@ public class TrackerUI extends JFrame {
 
             add(headerPanel, BorderLayout.NORTH);
 
+            // --- CHILDREN CONTAINER ---
             childrenPanel = new JPanel();
             childrenPanel.setLayout(new BoxLayout(childrenPanel, BoxLayout.Y_AXIS));
             childrenPanel.setOpaque(false);
             childrenPanel.setVisible(false);
             add(childrenPanel, BorderLayout.CENTER);
 
+            // --- HOVER & SELECTION LOGIC ---
             MouseAdapter mouseAction = new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -554,16 +578,19 @@ public class TrackerUI extends JFrame {
                 }
             };
 
+            // Applying listeners to the panels
             headerPanel.addMouseListener(mouseAction);
             col1.addMouseListener(mouseAction);
             col2.addMouseListener(mouseAction);
             col3.addMouseListener(mouseAction);
 
+            // Ensure text fields and images don't block the mouse clicks
             nameField.addMouseListener(mouseAction);
             amountField.addMouseListener(mouseAction);
             imgPlaceholder.addMouseListener(mouseAction);
         }
 
+        // Helper to format the amount nicely to 2 decimal places
         private String formatAmountString(String text) {
             String val = text.trim();
             if (val.isEmpty() || val.equals(".")) {
@@ -624,6 +651,7 @@ public class TrackerUI extends JFrame {
                 amountField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(150, 150, 150)));
                 nameField.requestFocusInWindow();
             } else {
+                // --- NEW: Snap to decimal formatting if user clicks 'Done' ---
                 amountField.setText(formatAmountString(amountField.getText()));
 
                 editBtn.setText("Edit");
