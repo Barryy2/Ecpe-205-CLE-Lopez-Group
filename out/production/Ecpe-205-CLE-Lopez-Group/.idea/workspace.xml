@@ -4,44 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3dde4266-454d-46dd-b391-c300664d46fe" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Ecpe-205-CLE-Lopez-Group.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Ecpe-205-CLE-Lopez-Group.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TrackerUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/TrackerUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bank_tracker.db" beforeDir="false" afterPath="$PROJECT_DIR$/bank_tracker.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Ecpe-205-CLE-Lopez-Group/.idea/workspace.xml" beforeDir="false" />
+    <list default="true" id="afefaf90-2237-470f-aba8-6553ef992676" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Class" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "JohnRayIno"
-  }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Barryy2/Ecpe-205-CLE-Lopez-Group.git",
-    "accountId": "99a5c320-2e37-4ff8-9519-3461138161ba"
-  }
-}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "customColor": "",
-  "associatedIndex": 8
+  "associatedIndex": 0
 }]]></component>
-  <component name="ProjectId" id="3C3u2Q3MhGjBV0ZBf5nGV95z8dB" />
+  <component name="ProjectId" id="3C44xbik4uIaqeOiFUcZFu7ZjlP" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -51,20 +29,17 @@
     "Application.Main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "inocencio__branch",
-    "kotlin-language-version-configured": "true",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2"
+    "git-widget-placeholder": "Castillon",
+    "kotlin-language-version-configured": "true"
   }
 }]]></component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="3dde4266-454d-46dd-b391-c300664d46fe" name="Changes" comment="" />
-      <created>1775626366842</created>
+      <changelist id="afefaf90-2237-470f-aba8-6553ef992676" name="Changes" comment="" />
+      <created>1775631756725</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1775626366842</updated>
+      <updated>1775631756725</updated>
     </task>
     <servers />
   </component>
